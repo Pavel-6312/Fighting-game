@@ -65,11 +65,18 @@ function create (){
         });
 
     this.anims.create({
-            key: 'p1-walk',
+            key: 'p1-walk-l',
             frames: this.anims.generateFrameNumbers('p1-walk', { start: 0, end: 6 }),
             frameRate: 10,
             repeat: 0
         });
+
+    this.anims.create({
+            key: 'p1-walk-r',
+            frames: this.anims.generateFrameNumbers('p1-walk', { start: 6, end: 12 }),
+            frameRate: 10,
+            repeat: 0
+        });    
 
 // Collider
     this.physics.add.collider(player, platforms);
@@ -83,20 +90,26 @@ function update (){
 
     if (cursors.left.isDown) {
         player.setVelocityX(-240);
-        player.anims.play('p1-walk', true);
+        player.anims.play('p1-walk-l', true);
     } 
 
     else if (cursors.right.isDown) {
         player.setVelocityX(240);
-        player.anims.play('p1-walk', true);
+        player.anims.play('p1-walk-r', true);
     } 
 
-    else if (cursors.up.isDown && player.body.touching.down) {
+    else {
+        player.setVelocityX(0);
+        player.anims.play('p1-idle', true);
+
+    }
+
+    if (cursors.up.isDown && player.body.touching.down) {
         player.setVelocityY(-550);
         
     }
 
-    else if (cursors.down.isDown) {
+    if (cursors.down.isDown) {
         player.setVelocityY(400);  
         player.anims.play('p1-death', true); 
     } 
@@ -105,11 +118,7 @@ function update (){
         player.anims.play('p1-attack', true);
     } 
 
-    else {
-        player.setVelocityX(0);
-        player.anims.play('p1-idle', true);
-
-    }
+    
 
     
 
