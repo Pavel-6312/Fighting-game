@@ -56,8 +56,8 @@ function create (){
 
     this.anims.create({
             key: 'p1-death',
-            frames: this.anims.generateFrameNumbers('p1-death', { start: 0, end: 6 }),
-            frameRate: 10,
+            frames: this.anims.generateFrameNumbers('p1-death', { start: 1, end: 1 }),
+            frameRate: 3,
         });
     
     this.anims.create({
@@ -140,12 +140,23 @@ function update (){
  
 //Attack   
     if (
-        cursors.space.isDown ||
-        cursors.space.isDown && cursors.right.isDown ||
-        cursors.space.isDown && cursors.right.isDown && player.body.touching.down ||
-        cursors.space.isDown && cursors.left.isDown ||
-        cursors.space.isDown && cursors.left.isDown && player.body.touching.down ||
-        cursors.space.isDown && player.body.touching.down == false
+        cursors.space.isDown
+        
+        // cursors.space.isDown && cursors.right.isDown && player.body.touching.down ||
+        // cursors.space.isDown && cursors.left.isDown ||
+        // cursors.space.isDown && cursors.left.isDown && player.body.touching.down ||
+        // cursors.space.isDown && player.body.touching.down == false
+        ) {
+        player.anims.play('p1-attack', true);
+    }
+
+    else if (
+        cursors.space.isDown
+        
+        // cursors.space.isDown && cursors.right.isDown && player.body.touching.down ||
+        // cursors.space.isDown && cursors.left.isDown ||
+        // cursors.space.isDown && cursors.left.isDown && player.body.touching.down ||
+        // cursors.space.isDown && player.body.touching.down == false
         ) {
         player.anims.play('p1-attack', true);
     }
