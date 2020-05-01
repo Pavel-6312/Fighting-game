@@ -21,43 +21,29 @@ var config = {
 // Variables
 var game = new Phaser.Game(config);
 
-var map;
+
 var player;
 var cursors;
-var groundLayer;
-var text;
-
+var platforms;
 
 function preload (){
-    // map
-    this.load.tilemapTiledJSON('map', '/assets/map.json');
-    // tiles in spritesheet 
-    this.load.spritesheet('tiles', 'assets/swamp/1 Tiles/Tileset.png', {frameWidth: 32, frameHeight: 32});
-
-    this.load.spritesheet('p1-idle', '/assets/character/3 SteamMan/SteamMan_idle.png', {frameWidth: 48,frameHeight: 48,});
-    this.load.spritesheet('p1-death', '/assets/character/3 SteamMan/SteamMan_jump.png', {frameWidth: 48,frameHeight: 48,});
-    this.load.spritesheet('p1-attack', '/assets/character/3 SteamMan/SteamMan_attack2.png', {frameWidth: 48, frameHeight: 48,})
+    this.load.image('ground', 'assets/platform.png');
+    this.load.spritesheet('p1-idle', 'assets/desert-enemy/5 Mummy/Mummy_idle.png', {frameWidth: 48,frameHeight: 48,});
+    this.load.spritesheet('p1-death', 'assets/desert-enemy/5 Mummy/Mummy_death.png', {frameWidth: 48,frameHeight: 48,});
+    this.load.spritesheet('p1-attack', 'assets/desert-enemy/5 Mummy/Mummy_attack.png', {frameWidth: 48, frameHeight: 48,})
+    this.load.spritesheet('p1-walk', 'assets/desert-enemy/5 Mummy/Mummy_walk.png', {frameWidth: 48, frameHeight: 48,})
 
 }
 
 function create (){
 //Environment
-    // load the map 
-    map = this.make.tilemap({key: 'map'});
-    
-    // // tiles for the ground layer
-    // var groundTiles = map.addTilesetImage('tiles');
-    // // create the ground layer
-    // groundLayer = map.createDynamicLayer('World', groundTiles, 0, 0);
-    // // the player will collide with this layer
-    // groundLayer.setCollisionByExclusion([-1]);
- 
-    // // set the boundaries of our game world
-    // this.physics.world.bounds.width = groundLayer.width;
-    // this.physics.world.bounds.height = groundLayer.height;
+    platforms = this.physics.add.staticGroup();
+    platforms.create(406, 357, 'ground');
 
 // Player
     player = this.physics.add.sprite(390, 180, 'p1-idle');
+    player.setCollideWorldBounds(true);
+    player.body.setGravityY(500);
     
     this.anims.create({
             key: 'p1-idle',
@@ -78,6 +64,16 @@ function create (){
             frameRate: 10,
         });
 
+    this.anims.create({
+            key: 'p1-walk',
+            frames: this.anims.generateFrameNumbers('p1-walk', { start: 0, end: 6 }),
+            frameRate: 10,
+            repeat: 0
+        });
+
+// Collider
+    this.physics.add.collider(player, platforms);
+
 // Keyboard controls
     cursors = this.input.keyboard.createCursorKeys();
     
@@ -85,14 +81,36 @@ function create (){
 
 function update (){
 
-    if (cursors.down.isDown){
-        player.anims.play('p1-death', true);
+    if (cursors.left.isDown) {
+        player.setVelocityX(-240);
+        player.anims.play('p1-walk', true);
+    } 
 
-    } else if (cursors.left.isDown){
-        player.anims.play('p1-attack', true);
+    else if (cursors.right.isDown) {
+        player.setVelocityX(240);
+        player.anims.play('p1-walk', true);
+    } 
 
-    } else{
-        player.anims.play('p1-idle', true);
+    else if (cursors.up.isDown && player.body.touching.down) {
+        player.setVelocityY(-550);
+        
     }
+
+    else if (cursors.down.isDown) {
+        player.setVelocityY(400);  
+        player.anims.play('p1-death', true); 
+    } 
+    
+    else if (cursors.space.isDown) {
+        player.anims.play('p1-attack', true);
+    } 
+
+    else {
+        player.setVelocityX(0);
+        player.anims.play('p1-idle', true);
+
+    }
+
+    
 
 }
