@@ -1,6 +1,6 @@
 var config = {
         type: Phaser.AUTO,
-        width: 600,
+        width: 300,
         height: 300,
         backgroundColor: 0xf1f1f1,
         pixelArt: true,
@@ -30,11 +30,11 @@ var platforms;
 
 function preload (){
     this.load.image('ground', 'assets/platform.png');
-    this.load.spritesheet('p1-idle', 'assets/desert-enemy/5 Mummy/Mummy_idle.png', {frameWidth: 48,frameHeight: 48,});
-    this.load.spritesheet('p1-death', 'assets/desert-enemy/5 Mummy/Mummy_death.png', {frameWidth: 48,frameHeight: 48,});
-    this.load.spritesheet('p1-attack', 'assets/desert-enemy/5 Mummy/Mummy_attack.png', {frameWidth: 48, frameHeight: 48,})
-    this.load.spritesheet('p1-walk', 'assets/desert-enemy/5 Mummy/Mummy_walk.png', {frameWidth: 48, frameHeight: 48,})
-    this.load.spritesheet('p1-jump', 'assets/character/3 SteamMan/SteamMan_jump.png', {frameWidth: 48, frameHeight: 48,})
+    this.load.spritesheet('p1-idle', 'assets/character/2 GraveRobber/GraveRobber_idle.png', {frameWidth: 48,frameHeight: 48,});
+    this.load.spritesheet('p1-death', 'assets/character/2 GraveRobber/GraveRobber_death.png', {frameWidth: 48,frameHeight: 48,});
+    this.load.spritesheet('p1-attack', 'assets/character/2 GraveRobber/GraveRobber_attack3.png', {frameWidth: 48, frameHeight: 48,})
+    this.load.spritesheet('p1-walk', 'assets/character/2 GraveRobber/GraveRobber_run.png', {frameWidth: 48, frameHeight: 48,})
+    this.load.spritesheet('p1-jump', 'assets/character/2 GraveRobber/GraveRobber_jump.png', {frameWidth: 48, frameHeight: 48,})
 
 }
 
@@ -46,12 +46,12 @@ function create (){
 // Player
     player = this.physics.add.sprite(200, 40, 'p1-idle');
     player.setCollideWorldBounds(true);
-    player.body.setGravityY(500);
+    player.body.setGravityY(1200);
     
     this.anims.create({
             key: 'p1-idle',
             frames: this.anims.generateFrameNumbers('p1-idle', { start: 0, end: 4 }),
-            frameRate: 10,
+            frameRate: 6,
         });
 
     this.anims.create({
@@ -62,7 +62,7 @@ function create (){
     
     this.anims.create({
             key: 'p1-attack',
-            frames: this.anims.generateFrameNumbers('p1-attack', { start: 3, end: 6 }),
+            frames: this.anims.generateFrameNumbers('p1-attack', { start: 4, end: 6 }),
             frameRate: 10,
         });
 
@@ -98,41 +98,58 @@ function update (){
 //     "do somthing"
 // }
 
-    if (cursors.left.isDown) {
+//Left  
+    if (cursors.left.isDown && player.body.touching.down) {
         player.setVelocityX(-240);
+        player.anims.play('p1-walk', true).setFlipX(true);
+    } 
+
+    else if (cursors.left.isDown) {
+        player.setVelocityX(-240);
+        player.anims.play('p1-jump', true).setFlipX(true);
+    } 
+
+//Right
+    else if (cursors.right.isDown && player.body.touching.down) {
+        player.setVelocityX(240);
         player.anims.play('p1-walk', true).setFlipX(false);
     } 
 
     else if (cursors.right.isDown) {
         player.setVelocityX(240);
-        player.anims.play('p1-walk', true).setFlipX(true);
-    } 
+        player.anims.play('p1-jump', true).setFlipX(false);
+    }
 
+//Down
     else if (cursors.down.isDown) {
         player.setVelocityY(400);  
         player.anims.play('p1-death', true); 
     } 
 
+    else if (
+        cursors.space.isDown ||
+        cursors.space.isDown && cursors.right.isDown && player.body.touching.down
+        ) {
+        player.anims.play('p1-attack', true);
+    }
+//Mid air
+    else if (player.body.touching.down == false){
+        player.anims.play('p1-jump', true);
+    }
+
+//Idle   
     else {
         player.setVelocityX(0);
         player.anims.play('p1-idle', true);
-
     }
 
+//Jump
     if (cursors.up.isDown && player.body.touching.down) {
-        player.setVelocityY(-550);
-        // player.anims.play('p1-jump', true); 
-        
+        player.setVelocityY(-550);  
     }
 
-    else if (player.body.touching.down === false) {
-        // player.anims.play('p1-jump', true); 
-        
-    }
     
-    else if (cursors.space.isDown) {
-        player.anims.play('p1-attack', true);
-    }
+    
 
     
 
