@@ -1,7 +1,7 @@
 var config = {
         type: Phaser.AUTO,
-        width: 400,
-        height: 180,
+        width: 600,
+        height: 300,
         backgroundColor: 0xf1f1f1,
         pixelArt: true,
         zoom: 1.5,
@@ -40,7 +40,7 @@ function preload (){
 function create (){
 //Environment
     platforms = this.physics.add.staticGroup();
-    platforms.create(406, 180, 'ground');
+    platforms.create(300, 284, 'ground');
 
 // Player
     player = this.physics.add.sprite(200, 40, 'p1-idle');
