@@ -1,8 +1,8 @@
 var config = {
         type: Phaser.AUTO,
-        width: 300,
+        width: 400,
         height: 300,
-        backgroundColor: 0xf1f1f1,
+        backgroundColor: 0xffffff,
         pixelArt: true,
         zoom: 1.5,
         physics: {
@@ -126,21 +126,28 @@ function update (){
         player.anims.play('p1-death', true); 
     } 
 
-    else if (
-        cursors.space.isDown ||
-        cursors.space.isDown && cursors.right.isDown && player.body.touching.down
-        ) {
-        player.anims.play('p1-attack', true);
-    }
 //Mid air
     else if (player.body.touching.down == false){
         player.anims.play('p1-jump', true);
     }
 
+
 //Idle   
     else {
         player.setVelocityX(0);
         player.anims.play('p1-idle', true);
+    }
+ 
+//Attack   
+    if (
+        cursors.space.isDown ||
+        cursors.space.isDown && cursors.right.isDown ||
+        cursors.space.isDown && cursors.right.isDown && player.body.touching.down ||
+        cursors.space.isDown && cursors.left.isDown ||
+        cursors.space.isDown && cursors.left.isDown && player.body.touching.down ||
+        cursors.space.isDown && player.body.touching.down == false
+        ) {
+        player.anims.play('p1-attack', true);
     }
 
 //Jump
