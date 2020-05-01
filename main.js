@@ -34,6 +34,7 @@ function preload (){
     this.load.spritesheet('p1-death', 'assets/desert-enemy/5 Mummy/Mummy_death.png', {frameWidth: 48,frameHeight: 48,});
     this.load.spritesheet('p1-attack', 'assets/desert-enemy/5 Mummy/Mummy_attack.png', {frameWidth: 48, frameHeight: 48,})
     this.load.spritesheet('p1-walk', 'assets/desert-enemy/5 Mummy/Mummy_walk.png', {frameWidth: 48, frameHeight: 48,})
+    this.load.spritesheet('p1-jump', 'assets/character/3 SteamMan/SteamMan_jump.png', {frameWidth: 48, frameHeight: 48,})
 
 }
 
@@ -68,6 +69,12 @@ function create (){
     this.anims.create({
             key: 'p1-walk',
             frames: this.anims.generateFrameNumbers('p1-walk', { start: 0, end: 6 }),
+            frameRate: 10,
+        });
+    
+    this.anims.create({
+            key: 'p1-jump',
+            frames: this.anims.generateFrameNumbers('p1-jump', { start: 0, end: 6 }),
             frameRate: 10,
         });
 
@@ -114,6 +121,12 @@ function update (){
 
     if (cursors.up.isDown && player.body.touching.down) {
         player.setVelocityY(-550);
+        // player.anims.play('p1-jump', true); 
+        
+    }
+
+    else if (player.body.touching.down === false) {
+        // player.anims.play('p1-jump', true); 
         
     }
     
