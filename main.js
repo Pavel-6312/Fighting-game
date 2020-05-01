@@ -1,8 +1,10 @@
 var config = {
         type: Phaser.AUTO,
-        width: 812,
-        height: 375,
+        width: 400,
+        height: 180,
         backgroundColor: 0xf1f1f1,
+        pixelArt: true,
+        zoom: 1.5,
         physics: {
             default: "arcade",
             arcade: {
@@ -38,10 +40,10 @@ function preload (){
 function create (){
 //Environment
     platforms = this.physics.add.staticGroup();
-    platforms.create(406, 357, 'ground');
+    platforms.create(406, 180, 'ground');
 
 // Player
-    player = this.physics.add.sprite(390, 180, 'p1-idle');
+    player = this.physics.add.sprite(200, 40, 'p1-idle');
     player.setCollideWorldBounds(true);
     player.body.setGravityY(500);
     
@@ -49,7 +51,6 @@ function create (){
             key: 'p1-idle',
             frames: this.anims.generateFrameNumbers('p1-idle', { start: 0, end: 4 }),
             frameRate: 10,
-            repeat: 0 
         });
 
     this.anims.create({
@@ -65,18 +66,10 @@ function create (){
         });
 
     this.anims.create({
-            key: 'p1-walk-l',
+            key: 'p1-walk',
             frames: this.anims.generateFrameNumbers('p1-walk', { start: 0, end: 6 }),
             frameRate: 10,
-            repeat: 0
         });
-
-    this.anims.create({
-            key: 'p1-walk-r',
-            frames: this.anims.generateFrameNumbers('p1-walk', { start: 6, end: 12 }),
-            frameRate: 10,
-            repeat: 0
-        });    
 
 // Collider
     this.physics.add.collider(player, platforms);
@@ -88,14 +81,29 @@ function create (){
 
 function update (){
 
+//     const conditionsArray = [
+//     condition1, 
+//     condition2,
+//     condition3,
+// ]
+
+// if (conditionsArray.indexOf(false) === -1) {
+//     "do somthing"
+// }
+
     if (cursors.left.isDown) {
         player.setVelocityX(-240);
-        player.anims.play('p1-walk-l', true);
+        player.anims.play('p1-walk', true).setFlipX(false);
     } 
 
     else if (cursors.right.isDown) {
         player.setVelocityX(240);
-        player.anims.play('p1-walk-r', true);
+        player.anims.play('p1-walk', true).setFlipX(true);
+    } 
+
+    else if (cursors.down.isDown) {
+        player.setVelocityY(400);  
+        player.anims.play('p1-death', true); 
     } 
 
     else {
@@ -108,15 +116,10 @@ function update (){
         player.setVelocityY(-550);
         
     }
-
-    if (cursors.down.isDown) {
-        player.setVelocityY(400);  
-        player.anims.play('p1-death', true); 
-    } 
     
     else if (cursors.space.isDown) {
         player.anims.play('p1-attack', true);
-    } 
+    }
 
     
 
