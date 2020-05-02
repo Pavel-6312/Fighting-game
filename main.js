@@ -24,7 +24,6 @@ var config = {
 // Variables (declare all variable that are used below)
 var game = new Phaser.Game(config);
 var player;
-var char2;
 var cursors;
 var platforms;
 
@@ -37,8 +36,9 @@ function preload (){
     this.load.spritesheet('p1-jump', 'assets/character/2 GraveRobber/GraveRobber_jump.png', {frameWidth: 48, frameHeight: 48,})
 
     this.load.spritesheet('p2-walk', 'assets/desert-enemy/6 Deceased/Deceased_walk.png', {frameWidth: 48,frameHeight: 48,});
-    this.load.spritesheet('p2-death', 'assets/desert-enemy/6 Deceased/Deceased_death.png', {frameWidth: 48,frameHeight: 48,});
 
+    this.load.spritesheet('p3-walk', 'assets/desert-enemy/5 Mummy/Mummy_walk.png', {frameWidth: 48,frameHeight: 48,});
+    
 }
 
 function create (){
@@ -67,6 +67,17 @@ function create (){
     });
 
     char2.anims.play('p2-walk',true);
+
+    char3 = this.physics.add.sprite(game.config.width, 200, 'p3-walk')
+
+    this.anims.create({
+        key: 'p3-walk',
+        frames: this.anims.generateFrameNumbers('p3-walk', { start: 0, end: 6 }),
+        frameRate: 6,
+        repeat: -1 // -1 run forever / 1 -> run once
+    });
+
+    char3.anims.play('p3-walk',true);
 
 //Player
     player = this.physics.add.sprite(game.config.width/2-40, game.config.height/2, 'p1-idle'); //Places sprite in the center of the screen
@@ -105,10 +116,29 @@ function create (){
 
 //Collider
     this.physics.add.collider(player, platforms);
+    this.physics.add.collider(char3, platforms);
 
 //Keyboard controls
     cursors = this.input.keyboard.createCursorKeys(); //enables keyboard input
-  
+}
+
+function doWalk()
+{
+    this.tweens.add(
+        {
+            targets: char3, 
+            duration: 1000, 
+            x:0, 
+            onComplete: onCompleteHandler,
+            onCompleteParams: [this]
+        });
+}
+
+function onCompleteHandler(tween, targets, scope) 
+{
+    var char3 = targets[0];
+    char3.x=game.config.width/2;
+    scope.doWalk()
 }
 
 function update (){
@@ -162,22 +192,18 @@ function update (){
         player.setVelocityY(-550);  
     }
 
-//Alt movement
-// char2.anims.play('p2-walk',true);
-
 char2.x-=0.5; //Moves char2 by 1px to the left
+
 if (char2.x < 0) { 
     char2.x = game.config.width; //If reches left border move to right border
-    }
-
-    
-
-
-    
-    
-
-    
-
-    
-
 }
+
+
+
+
+
+    
+
+ 
+}
+
