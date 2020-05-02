@@ -27,7 +27,8 @@ var player;
 var cursors;
 var platforms;
 
-function preload (){
+
+function preload(){
     this.load.image('ground', 'assets/platform.png');
     this.load.spritesheet('p1-idle', 'assets/character/2 GraveRobber/GraveRobber_idle.png', {frameWidth: 48,frameHeight: 48,});
     this.load.spritesheet('p1-death', 'assets/character/2 GraveRobber/GraveRobber_death.png', {frameWidth: 48,frameHeight: 48,});
@@ -41,7 +42,7 @@ function preload (){
     
 }
 
-function create (){
+function create(){
 //Environment
     platforms = this.physics.add.staticGroup(); //Adds ground 
     platforms.create(300, 284, 'ground'); //Places ground sprite
@@ -120,6 +121,12 @@ function create (){
 
 //Keyboard controls
     cursors = this.input.keyboard.createCursorKeys(); //enables keyboard input
+    
+    let boundFunc = doWalk.bind(this);
+    boundFunc()
+    // doWalk.bind(this);
+    // doWalk();
+    
 }
 
 function doWalk()
@@ -127,7 +134,7 @@ function doWalk()
     this.tweens.add(
         {
             targets: char3, 
-            duration: 1000, 
+            duration: 5000, 
             x:0, 
             onComplete: onCompleteHandler,
             onCompleteParams: [this]
@@ -137,8 +144,9 @@ function doWalk()
 function onCompleteHandler(tween, targets, scope) 
 {
     var char3 = targets[0];
-    char3.x=game.config.width/2;
-    scope.doWalk()
+    char3.x = 400;
+    let boundFunc = doWalk.bind(scope);
+boundFunc()
 }
 
 function update (){
