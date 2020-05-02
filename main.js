@@ -5,7 +5,7 @@ var config = {
         parent: 'game1', //id that can be added to html tag to insert the game there
         backgroundColor: 0xffffff,
         pixelArt: true, //fix blurred pixels
-        zoom: 1.5, //zoom th egame
+        zoom: 1, //zoom th egame
         physics: {
             default: "arcade",
             arcade: {
@@ -26,6 +26,8 @@ var game = new Phaser.Game(config);
 var player;
 var cursors;
 var platforms;
+var group;
+var char3;
 
 
 function preload(){
@@ -40,13 +42,14 @@ function preload(){
 
     this.load.spritesheet('p3-walk', 'assets/desert-enemy/5 Mummy/Mummy_walk.png', {frameWidth: 48,frameHeight: 48,});
     
+    this.load.audio('sound', 'assets/sound.wav');
 }
 
 function create(){
 //Environment
     platforms = this.physics.add.staticGroup(); //Adds ground 
     platforms.create(300, 284, 'ground'); //Places ground sprite
-
+ 
 //Enemy
     char2 = this.add.sprite(0,0, 'p2-walk')
     char2.setOrigin(0.5,0.5); //X Y Sets center point to the top left
@@ -114,6 +117,31 @@ function create(){
             frames: this.anims.generateFrameNumbers('p1-jump', { start: 0, end: 6 }),
             frameRate: 10,
         });
+//Graphics
+    this.graphics = this.add.graphics();
+    this.graphics.lineStyle(4,0xff0000);
+    this.graphics.fillStyle(0xff0000, 0.5);
+    this.graphics.moveTo(10,10);
+    this.graphics.lineTo(80,10);
+    this.graphics.strokePath();
+
+    this.graphics.strokeRect(50,50,50,50);
+    this.graphics.strokeCircle(150,150,10);
+    this.graphics.fillCircle(150,150,10);
+    
+//Sound
+    this.sound = this.sound.add('sound', {volume: 0.0});
+    this.sound.play(); 
+
+//Group of random objects
+    group = this.add.group();
+
+    for(var i = 0; i<5; i++){
+        var x =Phaser.Math.Between(10,300);
+        var y = Phaser.Math.Between(10,300);
+        var char4 = this.physics.add.sprite(x , y, 'p2-walk');
+        group.add(char4);
+    }
 
 //Collider
     this.physics.add.collider(player, platforms);
@@ -121,14 +149,21 @@ function create(){
 
 //Keyboard controls
     cursors = this.input.keyboard.createCursorKeys(); //enables keyboard input
-    
+
+// Tween function
     let boundFunc = doWalk.bind(this);
     boundFunc()
-    // doWalk.bind(this);
-    // doWalk();
     
+//Text
+    this.text = this.add.text(game.config.width/2, 40, 'Text', {
+        fontFamily:'Arial', 
+        color:'#f1f1f1',
+        fontSize:'40px'
+        });
+    this.text.setOrigin(0.5,0.5);
 }
 
+//Tween
 function doWalk()
 {
     this.tweens.add(
@@ -139,6 +174,10 @@ function doWalk()
             onComplete: onCompleteHandler,
             onCompleteParams: [this]
         });
+}
+
+function onDown(){
+    this.platforms.alpha = 0.5;
 }
 
 function onCompleteHandler(tween, targets, scope) 
