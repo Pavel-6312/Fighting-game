@@ -36,7 +36,6 @@ class SceneMain extends Phaser.Scene {
     
     //HP Txt
         playerHpText = this.add.text(20 ,20 ,'Start',{color:0xff0000});
-        enemyHpText = this.add.text(200 ,20 ,'Start',{color:0xff0000});
 
     //Enemy
         enemy = this.physics.add.sprite(game.config.width*0.75,game.config.height/2, 'p2-walk')
@@ -46,7 +45,7 @@ class SceneMain extends Phaser.Scene {
 
         //Enemy weapon
         enemyW = this.physics.add.sprite(enemy.x, enemy.y, 'weapon');
-        enemyW.body.setAllowGravity(false);
+        enemyW.body.setAllowGravity(false);enemyW.setAlpha(0);
 
         this.anims.create({
             key: 'p2-walk',
@@ -73,11 +72,12 @@ class SceneMain extends Phaser.Scene {
         player = this.physics.add.sprite(game.config.width*0.25, game.config.height/2, 'p1-idle');
         player.setCollideWorldBounds(true);
         player.body.setSize(16, 48, 8, 24);// x, y, offset x, offset y
-        playerHp=20;
+        playerHp=30;
 
     //Player weapon
         playerW = this.physics.add.sprite(player.x, player.y, 'weapon');
         playerW.body.setAllowGravity(false);
+        playerW.setAlpha(0);
 
 
         //idle
@@ -128,8 +128,7 @@ class SceneMain extends Phaser.Scene {
     update() 
     {
     //HP text
-        playerHpText.setText('Player HP ' + playerHp);
-        enemyHpText.setText('Enemy HP ' + enemyHp);
+        playerHpText.setText('Player HP ' + playerHp + ' / ' + 'Enemy HP ' + enemyHp);
 
     //Player movement
         
@@ -207,6 +206,7 @@ class SceneMain extends Phaser.Scene {
                     playerW.x = player.x + weaponRange;  
                 }
                  playerW.body.setSize(24, 8, 8, 12);
+                 playerW.setAlpha(1);
                         
             }
 
@@ -214,6 +214,7 @@ class SceneMain extends Phaser.Scene {
             {
                 playerW.body.setSize(1, 1, 1, 1  ) ;
                 playerW.x=player.x;
+                playerW.setAlpha(0);
             }
 
             //Jump
@@ -233,7 +234,9 @@ class SceneMain extends Phaser.Scene {
         distance = player.x - enemy.x;
         enemyW.x=enemy.x;
         enemyW.y=enemy.y; 
+        var weaponRange = 24; 
         enemyW.body.setSize(1, 1, 1, 1  );
+        
 
         //Follow left
         if (distance < -21) 
@@ -257,28 +260,39 @@ class SceneMain extends Phaser.Scene {
             enemy.setVelocityX(0);
             // enemy.anims.play('p2-idle',true); 
             enemy.anims.play('p2-attack',true); 
+    
+                if (enemy.flipX == false)
+                {
+                    weaponRange = weaponRange * -1
+                    enemyW.x = enemy.x + weaponRange; 
+                }
+                else {
+                    enemyW.x = enemy.x + weaponRange;  
+                }
+                    enemyW.body.setSize(24, 8, 8, 12);
+                    enemyW.setAlpha(1);
+            
+            
 
-            if (Date.now() > lastHitTimeEnemy + 1000/60 == true)
-            {
-            var weaponRange = 24; 
-            
-            if (enemy.flipX == false)
-            {
-                weaponRange = weaponRange * -1
-                enemyW.x = enemy.x + weaponRange; 
-            }
-            else {
-                enemyW.x = enemy.x + weaponRange;  
-            }
-                enemyW.body.setSize(24, 8, 8, 12);
-                        
-            
-            }
+            // if (Date.now() < lastHitTimeEnemy + 1000 == true)
+            // {
+            //     if (enemy.flipX == false)
+            //     {
+            //         weaponRange = weaponRange * -1
+            //         enemyW.x = enemy.x + weaponRange; 
+            //     }
+            //     else {
+            //         enemyW.x = enemy.x + weaponRange;  
+            //     }
+            //     enemyW.body.setSize(24, 8, 8, 12);
+            //     enemyW.setAlpha(1);
+            // }
 
             if (Date.now() < lastHitTimeEnemy + 1000/30 == true)
             {
                 enemyW.body.setSize(1, 1, 1, 1  ) ;
                 enemyW.x=enemy.x;
+                enemyW.setAlpha(0);
             }
         }
 
@@ -295,7 +309,7 @@ class SceneMain extends Phaser.Scene {
 
     function enemyHit (player)
     {
-        if (Date.now() > lastHitTimeEnemy + 1000/30 == true) 
+        if (Date.now() > lastHitTimeEnemy + 1000/10 == true) 
         {
             player.setTint(0xff0000);
             playerHp--;  

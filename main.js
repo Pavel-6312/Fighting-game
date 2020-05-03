@@ -13,7 +13,8 @@ var config = {
             default: "arcade",
             arcade: {
                 gravity: {y: 1200},
-                debug: true
+                debug: false
+                // debug: true
             }
         },
         scene: [SceneMain, SceneTitle]
@@ -31,7 +32,6 @@ var speed;
 var playerHp;
 var enemyHp;
 var playerHpText;
-var enemyHpText;
 var lastHitTimeEnemy = Date.now();
 var lastHitTimePlayer = Date.now();
 var playerW;
