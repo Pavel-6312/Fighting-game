@@ -1,6 +1,3 @@
-var game;
-window.onload=function()
-{
 var config = {
         type: Phaser.AUTO,
         width: 684,
@@ -15,13 +12,15 @@ var config = {
                 debug: true
             }
         },
-        scene: [SceneMain]
+        scene: {
+            key: 'main',
+            preload: preload,
+            create: create,
+            update: update
+        }
     };
-    game = new Phaser.Game(config);
-}
 
-
-
+var game = new Phaser.Game(config);
 var player;
 var enemy;
 var cursors;
