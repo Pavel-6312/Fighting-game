@@ -13,10 +13,10 @@ var config = {
             default: "arcade",
             arcade: {
                 gravity: {y: 1200},
-                debug: false
+                debug: true
             }
         },
-        scene: [SceneTitle,SceneMain]
+        scene: [SceneMain, SceneTitle]
     };
     game = new Phaser.Game(config);
 }
@@ -29,4 +29,11 @@ var rNum;
 var distance;
 var speed;
 var playerHp;
-var scoreText;
+var enemyHp;
+var playerHpText;
+var enemyHpText;
+var lastHitTimeEnemy = Date.now();
+var lastHitTimePlayer = Date.now();
+var playerW;
+var enemyW;
+var weaponRange;

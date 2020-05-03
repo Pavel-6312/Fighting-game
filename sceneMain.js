@@ -9,6 +9,10 @@ class SceneMain extends Phaser.Scene {
     //Ground
         this.load.image('platform', 'assets/platform.png');
         this.load.image('platform-sm', 'assets/platform-sm.png');
+
+    //Weapon
+        this.load.image('weapon', 'assets/swamp/3 Objects/Pointers/7.png');
+
     //Player
         this.load.spritesheet('p1-idle', 'assets/character/2 GraveRobber/GraveRobber_idle.png', {frameWidth: 48,frameHeight: 48,});
         this.load.spritesheet('p1-death', 'assets/character/2 GraveRobber/GraveRobber_death.png', {frameWidth: 48,frameHeight: 48,});
@@ -27,17 +31,22 @@ class SceneMain extends Phaser.Scene {
     //Environment
         platforms = this.physics.add.staticGroup(); //Adds ground 
         platforms.create(300, 284, 'platform'); //Places ground sprite
-
-        platforms.create(game.config.width/2+38, 252, 'platform-sm');
+        platforms.create(game.config.width/2, 252, 'platform-sm');
         platforms.create(game.config.width/2-38, 140, 'platform-sm');
     
     //HP Txt
-        scoreText = this.add.text(20 ,20 ,'Start',{color:0xff0000});
+        playerHpText = this.add.text(20 ,20 ,'Start',{color:0xff0000});
+        enemyHpText = this.add.text(200 ,20 ,'Start',{color:0xff0000});
 
     //Enemy
         enemy = this.physics.add.sprite(game.config.width*0.75,game.config.height/2, 'p2-walk')
         enemy.setCollideWorldBounds(true);
         enemy.body.setSize(16, 48, 8, 24);
+        enemyHp=20;
+
+        //Enemy weapon
+        enemyW = this.physics.add.sprite(enemy.x, enemy.y, 'weapon');
+        enemyW.body.setAllowGravity(false);
 
         this.anims.create({
             key: 'p2-walk',
@@ -64,7 +73,12 @@ class SceneMain extends Phaser.Scene {
         player = this.physics.add.sprite(game.config.width*0.25, game.config.height/2, 'p1-idle');
         player.setCollideWorldBounds(true);
         player.body.setSize(16, 48, 8, 24);// x, y, offset x, offset y
-        playerHp=500;
+        playerHp=20;
+
+    //Player weapon
+        playerW = this.physics.add.sprite(player.x, player.y, 'weapon');
+        playerW.body.setAllowGravity(false);
+
 
         //idle
         this.anims.create({
@@ -104,7 +118,8 @@ class SceneMain extends Phaser.Scene {
     //Collider
         this.physics.add.collider(player, platforms);
         this.physics.add.collider(enemy, platforms);
-        this.physics.add.collider(player, enemy, hit, null, this);
+        this.physics.add.overlap(enemyW, player, enemyHit.bind(this));
+        this.physics.add.overlap(playerW, enemy, playerHit.bind(this));
 
     //Keyboard controls
         cursors = this.input.keyboard.createCursorKeys();
@@ -112,12 +127,13 @@ class SceneMain extends Phaser.Scene {
 
     update() 
     {
-    //Player HP
-        scoreText.setText('HP ' + playerHp);
+    //HP text
+        playerHpText.setText('Player HP ' + playerHp);
+        enemyHpText.setText('Enemy HP ' + enemyHp);
 
     //Player movement
         
-        if(playerHp < 0)
+        if(playerHp < 1 || enemyHp < 1)
         {
             this.scene.start('SceneTitle');
         }
@@ -167,13 +183,37 @@ class SceneMain extends Phaser.Scene {
             else 
             {
                 player.setVelocityX(0);
-                player.anims.play('p1-idle', true);
+                player.anims.play('p1-idle', true);    
             }
- 
-            //Attack   
+
+            //Attack
+
+            playerW.x=player.x;
+            playerW.y=player.y; 
+            playerW.body.setSize(1, 1, 1, 1  );
+
             if (cursors.space.isDown) 
             {
                 player.anims.play('p1-attack', true);
+
+                var weaponRange = 24; 
+                
+                if (player.flipX == true)
+                {
+                    weaponRange = weaponRange * -1
+                    playerW.x = player.x + weaponRange; 
+                }
+                else {
+                    playerW.x = player.x + weaponRange;  
+                }
+                 playerW.body.setSize(24, 8, 8, 12);
+                        
+            }
+
+            if (cursors.space.getDuration()>1000/15)
+            {
+                playerW.body.setSize(1, 1, 1, 1  ) ;
+                playerW.x=player.x;
             }
 
             //Jump
@@ -182,10 +222,18 @@ class SceneMain extends Phaser.Scene {
                 player.setVelocityY(-550);  
             }
         }
+
+        if (Date.now() > lastHitTimeEnemy + 200 == true && playerHp > 5) 
+        {
+            player.clearTint()
+        }
     
     //Enemy movement
         
         distance = player.x - enemy.x;
+        enemyW.x=enemy.x;
+        enemyW.y=enemy.y; 
+        enemyW.body.setSize(1, 1, 1, 1  );
 
         //Follow left
         if (distance < -21) 
@@ -201,13 +249,37 @@ class SceneMain extends Phaser.Scene {
             enemy.anims.play('p2-walk', true).setFlipX(true);
         } 
 
-        //Idle
+        //Idle / Attack
+
+        
         else 
         {
             enemy.setVelocityX(0);
             // enemy.anims.play('p2-idle',true); 
-            enemy.anims.play('p2-attack',true);
-            enemy.body.setSize(36, 48, 8, 24);   
+            enemy.anims.play('p2-attack',true); 
+
+            if (Date.now() > lastHitTimeEnemy + 1000/60 == true)
+            {
+            var weaponRange = 24; 
+            
+            if (enemy.flipX == false)
+            {
+                weaponRange = weaponRange * -1
+                enemyW.x = enemy.x + weaponRange; 
+            }
+            else {
+                enemyW.x = enemy.x + weaponRange;  
+            }
+                enemyW.body.setSize(24, 8, 8, 12);
+                        
+            
+            }
+
+            if (Date.now() < lastHitTimeEnemy + 1000/30 == true)
+            {
+                enemyW.body.setSize(1, 1, 1, 1  ) ;
+                enemyW.x=enemy.x;
+            }
         }
 
         //Jump if blocked
@@ -215,17 +287,30 @@ class SceneMain extends Phaser.Scene {
         {
             enemy.setVelocityY(-240);
         }
+
+        
     }
 
-    
-
-    
 }
 
-function hit(player, enemy)
+    function enemyHit (player)
     {
-        player.setTint(0xff0000);
-        playerHp--;  
+        if (Date.now() > lastHitTimeEnemy + 1000/30 == true) 
+        {
+            player.setTint(0xff0000);
+            playerHp--;  
+            lastHitTimeEnemy = Date.now()
+        }
+    }
+
+    function playerHit (enemy)
+    {
+        if (Date.now() > lastHitTimePlayer + 1000/15 == true) 
+        {
+            enemy.setTint(0xff0000);
+            enemyHp--;  
+            lastHitTimePlayer = Date.now()
+        }
     }
 
     //Generate random number
