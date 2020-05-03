@@ -5,7 +5,7 @@ var config = {
         parent: 'game1', //canvas parent id
         backgroundColor: 0xffffff,
         pixelArt: true, //fix blurred pixels
-        zoom: 1,
+        zoom: 2,
         physics: {
             default: "arcade",
             arcade: {
