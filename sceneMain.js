@@ -112,7 +112,7 @@ class SceneMain extends Phaser.Scene {
         
         if(playerHp < 0)
         {
-            death();
+            this.scene.start('SceneTitle');
         }
 
         else
@@ -176,7 +176,6 @@ class SceneMain extends Phaser.Scene {
             }
         }
     
-
     //Enemy movement
         
         distance = player.x - enemy.x;
@@ -210,6 +209,10 @@ class SceneMain extends Phaser.Scene {
             enemy.setVelocityY(-240);
         }
     }
+
+    
+
+    
 }
 
 function hit(player, enemy)
@@ -218,17 +221,7 @@ function hit(player, enemy)
         playerHp--;  
     }
 
-//Generate random number
-// setInterval(function(){
-//     rNum = Phaser.Math.Between(0,300);
-// }, 1000);
-
-function death()
-{
-    if(playerHp < 0){
-    player.anims.play('p1-death',true); 
-    //    console.log('game over');
-    gameOver = true;
-    
-    }
-}
+    //Generate random number
+    // setInterval(function(){
+    //     rNum = Phaser.Math.Between(0,300);
+    // }, 1000);
