@@ -241,14 +241,14 @@ class SceneMain extends Phaser.Scene {
         //Follow left
         if (distance < -21) 
         {
-            enemy.setVelocityX(-100);
+            enemy.setVelocityX(-180);
             enemy.anims.play('p2-walk', true).setFlipX(false); 
         } 
 
         //Follow right
         else if (distance > 20) 
         {
-            enemy.setVelocityX(100);
+            enemy.setVelocityX(180);
             enemy.anims.play('p2-walk', true).setFlipX(true);
         } 
 
@@ -272,8 +272,6 @@ class SceneMain extends Phaser.Scene {
                     enemyW.body.setSize(24, 8, 8, 12);
                     enemyW.setAlpha(1);
             
-            
-
             // if (Date.now() < lastHitTimeEnemy + 1000 == true)
             // {
             //     if (enemy.flipX == false)
