@@ -29,3 +29,4 @@ var rNum;
 var distance;
 var speed;
 var playerHp;
+var scoreText;

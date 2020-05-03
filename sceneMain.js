@@ -31,6 +31,9 @@ class SceneMain extends Phaser.Scene {
         platforms.create(game.config.width/2+38, 252, 'platform-sm');
         platforms.create(game.config.width/2-38, 140, 'platform-sm');
     
+    //HP Txt
+        scoreText = this.add.text(20 ,20 ,'Start',{color:0xff0000});
+
     //Enemy
         enemy = this.physics.add.sprite(game.config.width*0.75,game.config.height/2, 'p2-walk')
         enemy.setCollideWorldBounds(true);
@@ -109,6 +112,9 @@ class SceneMain extends Phaser.Scene {
 
     update() 
     {
+    //Player HP
+        scoreText.setText('HP ' + playerHp);
+
     //Player movement
         
         if(playerHp < 0)
