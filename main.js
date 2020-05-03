@@ -50,7 +50,7 @@ function preload()
 
 function create()
 {
-    
+
 //Environment
     platforms = this.physics.add.staticGroup(); //Adds ground 
     platforms.create(300, 284, 'platform'); //Places ground sprite
@@ -116,7 +116,7 @@ function create()
     this.anims.create({
             key: 'p1-jump',
             frames: this.anims.generateFrameNumbers('p1-jump', { start: 0, end: 6 }),
-            frameRate: 10,
+            frameRate: 6,
         }); 
 
 //Collider
