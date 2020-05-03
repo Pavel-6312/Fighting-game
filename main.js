@@ -28,4 +28,4 @@ var platforms;
 var rNum;
 var distance;
 var speed;
-var playerHp=10;
+var playerHp;

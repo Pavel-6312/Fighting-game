@@ -61,6 +61,7 @@ class SceneMain extends Phaser.Scene {
         player = this.physics.add.sprite(game.config.width*0.25, game.config.height/2, 'p1-idle');
         player.setCollideWorldBounds(true);
         player.body.setSize(16, 48, 8, 24);// x, y, offset x, offset y
+        playerHp=500;
 
         //idle
         this.anims.create({
