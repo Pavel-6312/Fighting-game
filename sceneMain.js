@@ -30,9 +30,9 @@ class SceneMain extends Phaser.Scene {
     {
     //Environment
         platforms = this.physics.add.staticGroup(); //Adds ground 
-        platforms.create(300, 284, 'platform'); //Places ground sprite
-        platforms.create(game.config.width/2, 252, 'platform-sm');
-        platforms.create(game.config.width/2-38, 140, 'platform-sm');
+        platforms.create(game.config.width/2, 384, 'platform'); //Places ground sprite
+        platforms.create(160, 352, 'platform-sm');
+        platforms.create(game.config.width/2, 240, 'platform-sm');
     
     //HP Txt
         playerHpText = this.add.text(20 ,20 ,'Start',{color:0xff0000});
