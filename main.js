@@ -4,8 +4,8 @@ window.onload=function()
 {
 var config = {
         type: Phaser.AUTO,
-        width: 684,
-        height: 300,
+        width: 736,
+        height: 400,
         backgroundColor: 0xffffff,
         pixelArt: true, //fix blurred pixels
         zoom: 1,
