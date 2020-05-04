@@ -17,7 +17,11 @@ var config = {
                 // debug: true
             }
         },
+<<<<<<< HEAD
         scene: [SceneMain, SceneTitle,]
+=======
+        scene: [SceneMain, SceneTitle]
+>>>>>>> parent of bbb95cd... 1
     };
     game = new Phaser.Game(config);
 }
