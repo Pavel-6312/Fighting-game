@@ -18,7 +18,11 @@ var config = {
             }
         },
 <<<<<<< HEAD
+<<<<<<< HEAD
         scene: [SceneMain, SceneTitle,]
+=======
+        scene: [SceneMain, SceneTitle]
+>>>>>>> parent of bbb95cd... 1
 =======
         scene: [SceneMain, SceneTitle]
 >>>>>>> parent of bbb95cd... 1
