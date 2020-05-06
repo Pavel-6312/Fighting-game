@@ -29,7 +29,16 @@ class SceneMain extends Phaser.Scene {
         playerHpText = this.add.text(20 ,20 ,'Start',{color:0xff0000});
 
     //Sprites
-        this.player = new PlayerCreate({scene:this});
+        this.player = new Player(this, 0, 0, 'player');
+
+        player.direction = 'down';
+        player.setCollideWorldBounds(true);
+        player.body.setSize(16, 48, 8, 24);// X, Y, XYOffset
+        playerHp=30;    
+        this.physics.add.collider(player, platforms);
+
+        // this.player = new PlayerCreate({scene:this});
+
         this.enemy = new EnemyCreate({scene:this}); 
         
     // Enemy weapon
@@ -53,8 +62,7 @@ class SceneMain extends Phaser.Scene {
 
     update() 
     {
-    //State machine
-        this.stateMachine.step();
+    
 
     //HP text
         playerHpText.setText('Player HP ' + playerHp + ' / ' + 'Enemy HP ' + enemyHp); 

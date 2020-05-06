@@ -15,8 +15,34 @@ class PlayerPreload extends Phaser.GameObjects.Container
     }
 }
 
+//Player alt
+class Player extends Phaser.Physics.Arcade.Sprite {
+  constructor (config) {
+    super(config.scene, config.x, config.y, config.texture, config.frame);
+
+    this.scene.add.existing(this);
+    this.scene.physics.add.existing(this);
+
+    // Set physics stuff on body …
+
+    //The state machine managing the player
+        this.stateMachine = new StateMachine('idle', {
+            idle: new IdleState(),
+            move: new MoveState(),
+            swing: new SwingState(),
+            dash: new DashState(),
+        },[this, this.player]);
+  }
+
+    update () { 
+    //State machine
+        this.stateMachine.step();
+    }
+}
+
+
 //Create
-class PlayerCreate extends Phaser.GameObjects.Container
+class PlayerCreate extends Phaser.Physics.Arcade.Sprite
 {
     constructor(config)
     {
