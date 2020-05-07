@@ -1,3 +1,19 @@
+//This goes to PRELOAD
+class EnemyPreload extends Phaser.GameObjects.Container
+{
+    constructor(config)
+    {
+        super(config.scene);
+        this.load = config.scene.load;
+        
+        this.load.spritesheet('p2-walk', 'assets/desert-enemy/5 Mummy/Mummy_walk.png', {frameWidth: 48,frameHeight: 48,});
+        this.load.spritesheet('p2-idle', 'assets/desert-enemy/5 Mummy/Mummy_idle.png', {frameWidth: 48,frameHeight: 48,});
+        this.load.spritesheet('p2-attack', 'assets/desert-enemy/5 Mummy/Mummy_attack.png', {frameWidth: 48,frameHeight: 48,});
+
+    }
+}
+
+//This goes to CREATE
 class EnemyCreate extends Phaser.GameObjects.Container
 {
     constructor(config)
@@ -16,6 +32,11 @@ class EnemyCreate extends Phaser.GameObjects.Container
         enemy.body.setSize(16, 48, 8, 24);
         enemyHp=20;     
 
+        //Weapon
+        enemyW = this.physics.add.sprite(enemy.x, enemy.y, 'weapon');
+        enemyW.body.setAllowGravity(false);
+        enemyW.setAlpha(0);
+        
         this.physics.add.collider(enemy, platforms);
 
         this.anims.create({
@@ -41,20 +62,7 @@ class EnemyCreate extends Phaser.GameObjects.Container
     }
 };
 
-class EnemyPreload extends Phaser.GameObjects.Container
-{
-    constructor(config)
-    {
-        super(config.scene);
-        this.load = config.scene.load;
-        
-        this.load.spritesheet('p2-walk', 'assets/desert-enemy/5 Mummy/Mummy_walk.png', {frameWidth: 48,frameHeight: 48,});
-        this.load.spritesheet('p2-idle', 'assets/desert-enemy/5 Mummy/Mummy_idle.png', {frameWidth: 48,frameHeight: 48,});
-        this.load.spritesheet('p2-attack', 'assets/desert-enemy/5 Mummy/Mummy_attack.png', {frameWidth: 48,frameHeight: 48,});
-
-    }
-}
-
+//This goes to UPDATE
 class EnemyUpdate extends Phaser.GameObjects.Container
 {
     constructor(config)

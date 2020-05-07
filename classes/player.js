@@ -15,70 +15,49 @@ class PlayerPreload extends Phaser.GameObjects.Container
     }
 }
 
-//Player alt
-class Player extends Phaser.Physics.Arcade.Sprite {
-  constructor (config) {
-    super(config.scene, config.x, config.y, config.texture, config.frame);
-
-    this.scene.add.existing(this);
-    this.scene.physics.add.existing(this);
-
-    // Set physics stuff on body …
-
-    //The state machine managing the player
-        this.stateMachine = new StateMachine('idle', {
-            idle: new IdleState(),
-            move: new MoveState(),
-            swing: new SwingState(),
-            dash: new DashState(),
-        },[this, this.player]);
-  }
-
-    update () { 
-    //State machine
-        this.stateMachine.step();
-    }
-}
-
-
 //Create
-class PlayerCreate extends Phaser.Physics.Arcade.Sprite
+class PlayerCreate extends Phaser.GameObjects.Container
 {
     constructor(config)
     {
         super(config.scene);
 
+        //Varables for class
         this.scene = config.scene;
         this.physics = config.scene.physics;
         this.anims = config.scene.anims;
         this.platforms = config.scene.platforms;
         this.player = config.scene.player;
+        this.enemy = config.scene.enemy;
 
+        //Add player
         player = this.physics.add.sprite(game.config.width*0.25, game.config.height/2, 'p1-idle');
+
+        //Properties
         player.direction = 'down';
-
-        //The state machine managing the player
-        this.stateMachine = new StateMachine('idle', {
-            idle: new IdleState(),
-            move: new MoveState(),
-            swing: new SwingState(),
-            dash: new DashState(),
-        },[this, this.player]);
-
         player.setCollideWorldBounds(true);
         player.body.setSize(16, 48, 8, 24);// X, Y, XYOffset
         playerHp=30;    
 
+        //Weapon
+        playerW = this.physics.add.sprite(player.x, player.y, 'weapon');
+        playerW.body.setAllowGravity(false);
+        playerW.setAlpha(0);
+        
+        //Collider
         this.physics.add.collider(player, platforms);
 
-        //idle
+
+        //ANIMATIONS
+
+        //Idle
         this.anims.create({
                 key: 'p1-idle',
                 frames: this.anims.generateFrameNumbers('p1-idle', { start: 0, end: 4 }),
                 frameRate: 6,
             });
 
-        //death
+        //Death
         this.anims.create(
             {
                 key: 'p1-death',
@@ -86,7 +65,8 @@ class PlayerCreate extends Phaser.Physics.Arcade.Sprite
                 frameRate: 3,
                 repeat: 1
             });
-        
+
+        //Attack
         this.anims.create(
             {
                 key: 'p1-attack',
@@ -94,20 +74,21 @@ class PlayerCreate extends Phaser.Physics.Arcade.Sprite
                 frameRate: 10,
             });
 
+        //Walk
         this.anims.create(
             {
                 key: 'p1-walk',
                 frames: this.anims.generateFrameNumbers('p1-walk', { start: 0, end: 6 }),
                 frameRate: 10,
             });
-        
+
+        //Run
         this.anims.create(
             {
                 key: 'p1-jump',
                 frames: this.anims.generateFrameNumbers('p1-jump', { start: 0, end: 6 }),
                 frameRate: 6,
             });       
-
     }
 }
 
@@ -175,7 +156,7 @@ class PlayerUpdate extends Phaser.GameObjects.Container
             playerW.y=player.y; 
             playerW.body.setSize(1, 1, 1, 1  );
         
-            if (keyR.isDown) 
+            if (keyAction1.isDown) 
             {
                 player.anims.play('p1-attack', true);
                 var weaponRange = 24; 
@@ -196,7 +177,7 @@ class PlayerUpdate extends Phaser.GameObjects.Container
                         
             }
 
-            if (keyR.getDuration()>1000/15)
+            if (keyAction1.getDuration()>1000/15)
             {
                 playerW.body.setSize(1, 1, 1, 1  ) ;
                 playerW.x=player.x;
@@ -229,6 +210,7 @@ class PlayerUpdate extends Phaser.GameObjects.Container
     }
 }
 
+//***** STATES *****
 //Idle state
 class IdleState extends State{
   
@@ -363,3 +345,29 @@ class DashState extends State {
 // setInterval(function(){
 //     rNum = Phaser.Math.Between(0,300);
 // }, 1000);
+
+
+//Player alt
+// class Player extends Phaser.Physics.Arcade.Sprite {
+//   constructor (config) {
+//     super(config.scene, config.x, config.y, config.texture, config.frame);
+
+//     this.scene.add.existing(this);
+//     this.scene.physics.add.existing(this);
+
+//     // Set physics stuff on body …
+
+//     //The state machine managing the player
+//         this.stateMachine = new StateMachine('idle', {
+//             idle: new IdleState(),
+//             move: new MoveState(),
+//             swing: new SwingState(),
+//             dash: new DashState(),
+//         },[this, this.player]);
+//   }
+
+//     update () { 
+//     //State machine
+//         this.stateMachine.step();
+//     }
+// }

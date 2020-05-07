@@ -2,25 +2,21 @@ var game;
 
 class StateMachine 
 {
-    constructor(initialState, possibleStates, stateArgs=[]) 
-    {
+    constructor(initialState, possibleStates, stateArgs=[]) {
         this.initialState = initialState;
         this.possibleStates = possibleStates;
         this.stateArgs = stateArgs;
         this.state = null;
 
         // State instances get access to the state machine via this.stateMachine.
-        for (const state of Object.values(this.possibleStates)) 
-        {
+        for (const state of Object.values(this.possibleStates)) {
             state.stateMachine = this;
         }
     }
 
-    step() 
-    {
+    step() {
         // On the first step, the state is null and we need to initialize the first state.
-        if (this.state === null) 
-        {
+        if (this.state === null) {
             this.state = this.initialState;
             this.possibleStates[this.state].enter(...this.stateArgs);
         }
@@ -29,22 +25,18 @@ class StateMachine
         this.possibleStates[this.state].execute(...this.stateArgs);
     }
 
-    transition(newState, ...enterArgs) 
-    {
+    transition(newState, ...enterArgs) {
         this.state = newState;
         this.possibleStates[this.state].enter(...this.stateArgs, ...enterArgs);
     }
 }
 
-class State 
-{
-    enter() 
-    {
+class State {
+    enter() {
 
     }
 
-    execute() 
-    {
+    execute(){
 
     }
 }
@@ -86,8 +78,8 @@ var enemyW;
 
 //Controls
 var cursors;
-var keyR;
-var keyE;
+var keyAction1;
+var keyAction2;
 
 //Environment
 var platforms;
