@@ -106,33 +106,33 @@ class PlayerUpdate extends Phaser.GameObjects.Container
         this.player = config.scene.player;
             
             //Left  
-            if (cursors.left.isDown && player.body.touching.down) 
+            if (keys.left.isDown && player.body.touching.down) 
             {
                 player.setVelocityX(-240);
                 player.anims.play('p1-walk', true).setFlipX(true);
             } 
 
-            else if (cursors.left.isDown) 
+            else if (keys.left.isDown) 
             {
                 player.setVelocityX(-240);
                 player.anims.play('p1-jump', true).setFlipX(true);
             } 
 
             //Right
-            else if (cursors.right.isDown && player.body.touching.down) 
+            else if (keys.right.isDown && player.body.touching.down) 
             {
                 player.setVelocityX(240);
                 player.anims.play('p1-walk', true).setFlipX(false);
             } 
 
-            else if (cursors.right.isDown) 
+            else if (keys.right.isDown) 
             {
                 player.setVelocityX(240);
                 player.anims.play('p1-jump', true).setFlipX(false);
             }
 
             //Down
-            else if (cursors.down.isDown) 
+            else if (keys.down.isDown) 
             {
                 player.setVelocityY(400);  
                 player.anims.play('p1-death', true); 
@@ -185,19 +185,19 @@ class PlayerUpdate extends Phaser.GameObjects.Container
             }
 
             //Jump
-            if (cursors.up.isDown && player.body.touching.down) 
+            if (keys.up.isDown && player.body.touching.down) 
             {
                 player.setVelocityY(-550);  
             }
 
             //Dash add timer
-            if(cursors.right.isDown && cursors.space.isDown)
+            if(keys.right.isDown && keys.space.isDown)
             {
                 player.setVelocityX(600);
                 player.anims.play('p1-jump', true).setFlipX(true);
             }
 
-            else if (cursors.left.isDown && cursors.space.isDown)
+            else if (keys.left.isDown && keys.space.isDown)
             {
                 player.setVelocityX(-600);
                 player.anims.play('p1-jump', true).setFlipX(false);
@@ -214,14 +214,16 @@ class PlayerUpdate extends Phaser.GameObjects.Container
 //Idle state
 class IdleState extends State{
   
-    enter(scene, player){
+    enter(scene){
+        console.log(player);
         player.setVelocity(0);
         player.anims.play(`walk-${player.direction}`);
         player.anims.stop();
     }
 
-    execute(scene, player){
-        const{left, right, up, down, space, shift} = scene.keys;
+    execute(scene){
+        const{left, right, up, down, space, shift} = keys;
+
         // Transition to swing if pressing space
         if (space.isDown){
             this.stateMachine.transition('swing');
@@ -242,8 +244,8 @@ class IdleState extends State{
 
 //Move state
 class MoveState extends State {
-  execute(scene, player) {
-    const {left, right, up, down, space, shift} = scene.keys;
+  execute(scene) {
+    const {left, right, up, down, space, shift} = keys;
     
     // Transition to swing if pressing space
     if (space.isDown) {
@@ -285,7 +287,7 @@ class MoveState extends State {
 
 //Swing state
 class SwingState extends State {
-  enter(scene, player) {
+  enter(scene) {
     player.setVelocity(0);
     // player.anims.play(`swing-${player.direction}`);
     player.once('animationcomplete', () => {
@@ -296,7 +298,7 @@ class SwingState extends State {
 
 //Dash state
 class DashState extends State {
-  enter(scene, player) {
+  enter(scene) {
     player.setVelocity(0);
     // player.anims.play(`swing-${player.direction}`);
     switch (player.direction) 

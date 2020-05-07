@@ -12,6 +12,8 @@ class StateMachine
         for (const state of Object.values(this.possibleStates)) {
             state.stateMachine = this;
         }
+
+        stateMachine = this;
     }
 
     step() {
@@ -41,26 +43,25 @@ class State {
     }
 }
 
-window.onload=function()
-{
-var config = {
-        type: Phaser.AUTO,
-        width: 812,
-        height: 375,
-        backgroundColor: 0xffffff,
-        pixelArt: true, //fix blurred pixels
-        zoom: 1,
-        physics: {
-            default: "arcade",
-            arcade: {
-                gravity: {y: 1200},
-                debug: false
-                // debug: true
-            }
-        },
-        scene: [SceneMain, SceneTitle,]
-        // scene: [SceneTitle, SceneMain, ]
-    };
+window.onload=function(){
+    var config = {
+            type: Phaser.AUTO,
+            width: 812,
+            height: 375,
+            backgroundColor: 0xffffff,
+            pixelArt: true, //fix blurred pixels
+            zoom: 1,
+            physics: {
+                default: "arcade",
+                arcade: {
+                    gravity: {y: 1200},
+                    debug: false
+                    // debug: true
+                }
+            },
+            scene: [SceneMain, SceneTitle,]
+            // scene: [SceneTitle, SceneMain, ]
+        };
     game = new Phaser.Game(config);
 }
 
@@ -77,7 +78,7 @@ var lastHitTimeEnemy = Date.now();
 var enemyW;
 
 //Controls
-var cursors;
+var keys;
 var keyAction1;
 var keyAction2;
 
@@ -92,3 +93,4 @@ var playerHpText;
 var weaponRange;
 
 var stateMachine;
+var state;

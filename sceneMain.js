@@ -29,7 +29,7 @@ class SceneMain extends Phaser.Scene {
         this.physics.add.overlap(enemyW, player, enemyHit.bind(this));
 
     //Controls
-        cursors = this.input.keyboard.createCursorKeys();
+        keys = this.input.keyboard.createCursorKeys();
         keyAction1 = this.input.keyboard.addKey('X');
         keyAction2 = this.input.keyboard.addKey('Z');
 
@@ -40,10 +40,9 @@ class SceneMain extends Phaser.Scene {
     update() {
     //Movement
         new EnemyUpdate({scene:this}); 
-        new PlayerUpdate({scene:this});
+        // new PlayerUpdate({scene:this});
 
-        // this.stateMachine.step();
-
+        this.stateMachine.step();
     //HP text
         playerHpText.setText('Player HP ' + playerHp + ' / ' + 'Enemy HP ' + enemyHp); 
     //End game
