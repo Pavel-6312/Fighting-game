@@ -55,6 +55,7 @@ class PlayerCreate extends Phaser.GameObjects.Container
                 key: 'p1-idle',
                 frames: this.anims.generateFrameNumbers('p1-idle', { start: 0, end: 4 }),
                 frameRate: 6,
+                repeat: -1
             });
 
         //Death
@@ -105,51 +106,6 @@ class PlayerUpdate extends Phaser.GameObjects.Container
         this.platforms = config.scene.platforms;
         this.player = config.scene.player;
             
-            //Left  
-            if (keys.left.isDown && player.body.touching.down) 
-            {
-                player.setVelocityX(-240);
-                player.anims.play('p1-walk', true).setFlipX(true);
-            } 
-
-            else if (keys.left.isDown) 
-            {
-                player.setVelocityX(-240);
-                player.anims.play('p1-jump', true).setFlipX(true);
-            } 
-
-            //Right
-            else if (keys.right.isDown && player.body.touching.down) 
-            {
-                player.setVelocityX(240);
-                player.anims.play('p1-walk', true).setFlipX(false);
-            } 
-
-            else if (keys.right.isDown) 
-            {
-                player.setVelocityX(240);
-                player.anims.play('p1-jump', true).setFlipX(false);
-            }
-
-            //Down
-            else if (keys.down.isDown) 
-            {
-                player.setVelocityY(400);  
-                player.anims.play('p1-death', true); 
-            } 
-
-            //Mid air
-            else if (player.body.touching.down == false)
-            {
-                player.anims.play('p1-jump', true);
-            }
-
-            //Idle   
-            else 
-            {
-                player.setVelocityX(0);
-                player.anims.play('p1-idle', true);    
-            }
 
             //Attack
             playerW.x=player.x;
@@ -184,25 +140,6 @@ class PlayerUpdate extends Phaser.GameObjects.Container
                 playerW.setAlpha(0);
             }
 
-            //Jump
-            if (keys.up.isDown && player.body.touching.down) 
-            {
-                player.setVelocityY(-550);  
-            }
-
-            //Dash add timer
-            if(keys.right.isDown && keys.space.isDown)
-            {
-                player.setVelocityX(600);
-                player.anims.play('p1-jump', true).setFlipX(true);
-            }
-
-            else if (keys.left.isDown && keys.space.isDown)
-            {
-                player.setVelocityX(-600);
-                player.anims.play('p1-jump', true).setFlipX(false);
-            }
-
         if (Date.now() > lastHitTimeEnemy + 200 == true && playerHp > 5) 
         {
             player.clearTint()
@@ -210,33 +147,32 @@ class PlayerUpdate extends Phaser.GameObjects.Container
     }
 }
 
-//***** STATES *****
+//STATES
 //Idle state
 class IdleState extends State{
   
     enter(scene){
-        console.log(player);
         player.setVelocity(0);
-        player.anims.play(`walk-${player.direction}`);
-        player.anims.stop();
+        player.anims.play('p1-idle', true);        
     }
 
     execute(scene){
         const{left, right, up, down, space, shift} = keys;
 
-        // Transition to swing if pressing space
-        if (space.isDown){
-            this.stateMachine.transition('swing');
-            return;
-        }
-        // Transition to dash if pressing shift
-        if (shift.isDown){
+        // Transition to dash
+        if (space.isDown || space.isDown && left.isDown || space.isDown && right.down){
             this.stateMachine.transition('dash');
             return;
         }
-        // Transition to move if pressing a movement key
-        if (left.isDown || right.isDown || up.isDown || down.isDown){
+        // Transition to move
+        if (left.isDown || right.isDown ){
             this.stateMachine.transition('move');
+            return;
+        }
+
+        // Transition to jump
+        if (keys.up.isDown && player.body.touching.down){
+            this.stateMachine.transition('jump');
             return;
         }
     }
@@ -247,14 +183,8 @@ class MoveState extends State {
   execute(scene) {
     const {left, right, up, down, space, shift} = keys;
     
-    // Transition to swing if pressing space
-    if (space.isDown) {
-      this.stateMachine.transition('swing');
-      return;
-    }
-    
-    // Transition to dash if pressing shift
-    if (shift.isDown) {
+    // Transition to dash
+    if (space.isDown || space.isDown && left.isDown || space.isDown && right.down) {
       this.stateMachine.transition('dash');
       return;
     }
@@ -264,68 +194,80 @@ class MoveState extends State {
       this.stateMachine.transition('idle');
       return;
     }
-    
-    player.setVelocity(0);
-    if (up.isDown) {
-      player.setVelocityY(-100);
-      player.direction = 'up';
-    } else if (down.isDown) {
-      player.setVelocityY(100); 
-      player.direction = 'down';
-    }
-    if (left.isDown) {
-      player.setVelocityX(-100);
-      player.direction = 'left';
-    } else if (right.isDown) {
-      player.setVelocityX(100);
-      player.direction = 'right';
-    }
-    
-    // player.anims.play(`walk-${player.direction}`, true);
-  }
-}
 
-//Swing state
-class SwingState extends State {
-  enter(scene) {
-    player.setVelocity(0);
-    // player.anims.play(`swing-${player.direction}`);
-    player.once('animationcomplete', () => {
-      this.stateMachine.transition('idle');
-    });
+    // Transition to jump
+    if (keys.up.isDown && player.body.touching.down){
+        this.stateMachine.transition('jump');
+        return;
+    }
+    
+    if (left.isDown && player.body.touching.down) {
+        player.setVelocityX(-240);
+        player.direction = 'left';
+        player.anims.play('p1-walk', true).setFlipX(true);
+    } 
+
+    else if (right.isDown && player.body.touching.down) {
+        player.setVelocityX(240);
+        player.direction = 'right';
+        player.anims.play('p1-walk', true).setFlipX(false);
+    }
   }
 }
 
 //Dash state
 class DashState extends State {
   enter(scene) {
-    player.setVelocity(0);
-    // player.anims.play(`swing-${player.direction}`);
-    switch (player.direction) 
-    {
-        case 'up':
-            player.setVelocityY(-300);
-            break;
 
-        case 'down':
-            player.setVelocityY(300);
-            break;
-
-        case 'left':
-            player.setVelocityX(-300);
-            break;
-
-        case 'right':
-            player.setVelocityX(300);
-            break;
+    if(player.direction == 'left'){
+        player.setVelocityX(-600);
     }
 
+    else{
+        player.setVelocityX(600);
+    }
     
     // Wait a third of a second and then go back to idle
-    scene.time.delayedCall(300, () => {
+    scene.time.delayedCall(100, () => {
       this.stateMachine.transition('idle');
     });
   }
+}
+
+class JumpState extends State {
+    enter(scene) {
+    
+        if (keys.up.isDown && player.body.touching.down){
+            player.setVelocityY(-550);
+            player.anims.play('p1-jump', true);  
+        }  
+    }
+
+    execute(scene){
+        if(player.body.touching.down){
+            this.stateMachine.transition('idle');
+        } 
+
+        else if (keys.right.isDown) 
+            {
+                player.setVelocityX(200);
+                player.anims.play('p1-jump', true).setFlipX(false);
+                player.direction = 'right';
+            }
+
+        else if (keys.left.isDown) 
+        {
+            player.setVelocityX(-200);
+            player.anims.play('p1-jump', true).setFlipX(true);
+            player.direction = 'left';
+        }
+
+        else if (keys.down.isDown) 
+        {
+            player.setVelocityY(500);
+            player.anims.play('p1-jump', true);
+        }
+    }
 }
 
 
@@ -341,7 +283,10 @@ class DashState extends State {
 
 
 
-
+// //Delay transition to idle
+// scene.time.delayedCall(500, () => {     
+//     this.stateMachine.transition('idle');
+// });
 
 //Generate random number
 // setInterval(function(){
@@ -363,7 +308,6 @@ class DashState extends State {
 //         this.stateMachine = new StateMachine('idle', {
 //             idle: new IdleState(),
 //             move: new MoveState(),
-//             swing: new SwingState(),
 //             dash: new DashState(),
 //         },[this, this.player]);
 //   }

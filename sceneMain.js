@@ -5,6 +5,7 @@ class SceneMain extends Phaser.Scene {
     }
 
     preload() {
+        this.load.image('bg', 'assets/bg.png');
         new PlatformsPreload({scene:this}); 
         new PlayerPreload({scene:this}); 
         new EnemyPreload({scene:this}); 
@@ -12,6 +13,7 @@ class SceneMain extends Phaser.Scene {
 
     create() {     
     //Sprites
+        this.add.image(game.config.width/2, game.config.height/2, 'bg');
         this.platforms = new PlatformsCreate({scene:this});
         this.enemy = new EnemyCreate({scene:this}); 
         this.player = new PlayerCreate({scene:this});
@@ -20,8 +22,8 @@ class SceneMain extends Phaser.Scene {
         this.stateMachine = new StateMachine('idle', {
             idle: new IdleState(),
             move: new MoveState(),
-            swing: new SwingState(),
             dash: new DashState(),
+            jump: new JumpState(),
         },[this, this.player]);
 
     //Colliders
@@ -34,17 +36,25 @@ class SceneMain extends Phaser.Scene {
         keyAction2 = this.input.keyboard.addKey('Z');
 
     //HP text
-        playerHpText = this.add.text(20 ,20 ,'Start',{color:0xff0000});
+        playerHpText = this.add.text(20 ,20 ,'Start', {
+        fontSize: '24px',
+        fontFamily: 'Arial',
+        color: '#ffffff',
+        align: 'center',
+        lineSpacing: 44,
+      });
     }
 
     update() {
     //Movement
-        new EnemyUpdate({scene:this}); 
+        // new EnemyUpdate({scene:this}); 
         // new PlayerUpdate({scene:this});
 
         this.stateMachine.step();
     //HP text
-        playerHpText.setText('Player HP ' + playerHp + ' / ' + 'Enemy HP ' + enemyHp); 
+        // playerHpText.setText('Player HP ' + playerHp + ' / ' + 'Enemy HP ' + enemyHp + ' / ' + this.stateMachine.state); 
+
+        playerHpText.setText(this.stateMachine.state + ' / ' + player.direction);
     //End game
         if(playerHp < 1 || enemyHp < 1)
         {
