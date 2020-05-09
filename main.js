@@ -99,7 +99,7 @@ var dashTime = 20;
 var jumpTime = 30;
 var attTime = 600;
 var jumpVel = 2000;
-var moveVel = 250;
+var moveVel = 180;
 
 var floatVelX = 200;
 var floatVelY = 400;

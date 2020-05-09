@@ -58,7 +58,7 @@ class SceneMain extends Phaser.Scene {
         playerHpText.setText(
             ' / ' + dashVel + 
             ' / ' + dashTime +
-            ' / floarVelX ' + floatVelX + 
+            ' / floatVelX ' + floatVelX + 
             ' / ' + player.direction +  
             ' ' + this.stateMachine.state   
         );

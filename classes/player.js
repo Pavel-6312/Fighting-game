@@ -7,14 +7,14 @@ class PlayerPreload extends Phaser.GameObjects.Container
         this.load = config.scene.load;
         
          //Player
-        this.load.spritesheet('p1-idle', 'assets/character/2 GraveRobber/GraveRobber_idle.png', {frameWidth: 48,frameHeight: 48,});
+        
         this.load.spritesheet('p1-death', 'assets/character/2 GraveRobber/GraveRobber_death.png', {frameWidth: 48,frameHeight: 48,});
-        this.load.spritesheet('p1-attack', 'assets/character/2 GraveRobber/GraveRobber_attack1.png', {frameWidth: 48, frameHeight: 48,})
-        this.load.spritesheet('p1-walk', 'assets/character/2 GraveRobber/GraveRobber_run.png', {frameWidth: 48, frameHeight: 48,})
-        this.load.spritesheet('p1-jump', 'assets/character/2 GraveRobber/GraveRobber_jump.png', {frameWidth: 48, frameHeight: 48,})
+        
+        this.load.spritesheet('p1-walk', 'assets/p-run.png', {frameWidth: 48, frameHeight: 48,})
+        this.load.spritesheet('p1-jump', 'assets/p-jump.png', {frameWidth: 48, frameHeight: 48,})
 
-        this.load.spritesheet('p-idle', 'assets/p-idle.png', {frameWidth: 48, frameHeight: 48,})
-        this.load.spritesheet('p-attack', 'assets/p-attack.png', {frameWidth: 48, frameHeight: 48,})
+        this.load.spritesheet('p1-idle', 'assets/p-idle.png', {frameWidth: 48, frameHeight: 48,})
+        this.load.spritesheet('p1-attack', 'assets/p-attack.png', {frameWidth: 48, frameHeight: 48,})
     }
 }
 
@@ -55,7 +55,7 @@ class PlayerCreate extends Phaser.GameObjects.Container
         //Idle
         this.anims.create({
                 key: 'p1-idle',
-                frames: this.anims.generateFrameNumbers('p-idle', { start: 0, end: 4 }),
+                frames: this.anims.generateFrameNumbers('p1-idle', { start: 0, end: 4 }),
                 frameRate: 6,
                 repeat: -1
             });
@@ -73,7 +73,7 @@ class PlayerCreate extends Phaser.GameObjects.Container
         this.anims.create(
             {
                 key: 'p1-attack',
-                frames: this.anims.generateFrameNumbers('p-attack', { start: 0, end: 5 }),
+                frames: this.anims.generateFrameNumbers('p1-attack', { start: 0, end: 6 }),
                 frameRate: 10,
             });
 
@@ -85,7 +85,7 @@ class PlayerCreate extends Phaser.GameObjects.Container
                 frameRate: 10,
             });
 
-        //Run
+        //Jump
         this.anims.create(
             {
                 key: 'p1-jump',
