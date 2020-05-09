@@ -60,7 +60,8 @@ class SceneMain extends Phaser.Scene {
             ' / ' + dashTime +
             ' / floatVelX ' + floatVelX + 
             ' / ' + player.direction +  
-            ' ' + this.stateMachine.state   
+            ' ' + this.stateMachine.state +
+            ' / attTime ' + attTime 
         );
 
     //End game

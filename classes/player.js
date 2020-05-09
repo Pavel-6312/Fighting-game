@@ -75,6 +75,7 @@ class PlayerCreate extends Phaser.GameObjects.Container
                 key: 'p1-attack',
                 frames: this.anims.generateFrameNumbers('p1-attack', { start: 0, end: 6 }),
                 frameRate: 10,
+                repeat:0
             });
 
         //Walk
@@ -210,6 +211,12 @@ class MoveState extends State {
         this.stateMachine.transition('jump');
         return;
     }
+
+    // to attack
+    if ( key1.isDown || key2.isDown ){
+        this.stateMachine.transition('attack');
+        return;
+    }
     
     if (left.isDown && player.body.touching.down) {
         player.setVelocityX(-moveVel);
@@ -331,7 +338,8 @@ class JumpState extends State {
 //ATTACK
 class AttackState extends State{
     enter(scene) {
-
+        player.setVelocity(0);
+        player.anims.play('p1-attack', true);
     }
 
     execute(scene){
@@ -343,9 +351,8 @@ class AttackState extends State{
     
         if (key1.isDown) 
         {
-            player.anims.play('p1-attack', true);
-            var weaponRange = 24; 
-            console.log(1);
+            
+            var weaponRange = 24;
                 
             if (player.flipX == true)
             {
@@ -358,8 +365,7 @@ class AttackState extends State{
                 playerW.x = player.x + weaponRange;  
             }
 
-                playerW.body.setSize(24, 8, 8, 12);
-                // playerW.setAlpha(1);         
+                playerW.body.setSize(24, 8, 8, 12);         
         }
 
         if (key1.getDuration()>1000/15)
@@ -369,16 +375,21 @@ class AttackState extends State{
             playerW.setAlpha(0);
         }
 
-        // to move
-        if (left.isDown || right.isDown ){
-            this.stateMachine.transition('move');
-            return;
-        }
-
-        // to idle
-        scene.time.delayedCall(attTime, () => {  
-            this.stateMachine.transition('idle');
-            return;
+        scene.time.delayedCall(attTime, () => { 
+            if (left.isDown || right.isDown ){
+                // to move
+                this.stateMachine.transition('move');
+                return;
+            } 
+            else if (keys.up.isDown && player.body.touching.down){
+                this.stateMachine.transition('jump');
+                return;
+            }
+            else if ( key1.isDown ==false || key2.isDown==false  ){
+                // to idle
+                this.stateMachine.transition('idle');
+                return;
+            }
         });
     }
 }
