@@ -12,6 +12,9 @@ class PlayerPreload extends Phaser.GameObjects.Container
         this.load.spritesheet('p1-attack', 'assets/character/2 GraveRobber/GraveRobber_attack1.png', {frameWidth: 48, frameHeight: 48,})
         this.load.spritesheet('p1-walk', 'assets/character/2 GraveRobber/GraveRobber_run.png', {frameWidth: 48, frameHeight: 48,})
         this.load.spritesheet('p1-jump', 'assets/character/2 GraveRobber/GraveRobber_jump.png', {frameWidth: 48, frameHeight: 48,})
+
+        this.load.spritesheet('p-idle', 'assets/p-idle.png', {frameWidth: 48, frameHeight: 48,})
+        this.load.spritesheet('p-attack', 'assets/p-attack.png', {frameWidth: 48, frameHeight: 48,})
     }
 }
 
@@ -34,11 +37,10 @@ class PlayerCreate extends Phaser.GameObjects.Container
         player = this.physics.add.sprite(game.config.width*0.25, game.config.height/2, 'p1-idle');
 
         //Properties
-        player.direction = 'down';
+        player.direction = 'right';
         player.setCollideWorldBounds(true);
         player.body.setSize(16, 48, 8, 24);// X, Y, XYOffset
-        playerHp=30;    
-
+            
         //Weapon
         playerW = this.physics.add.sprite(player.x, player.y, 'weapon');
         playerW.body.setAllowGravity(false);
@@ -53,7 +55,7 @@ class PlayerCreate extends Phaser.GameObjects.Container
         //Idle
         this.anims.create({
                 key: 'p1-idle',
-                frames: this.anims.generateFrameNumbers('p1-idle', { start: 0, end: 4 }),
+                frames: this.anims.generateFrameNumbers('p-idle', { start: 0, end: 4 }),
                 frameRate: 6,
                 repeat: -1
             });
@@ -62,16 +64,16 @@ class PlayerCreate extends Phaser.GameObjects.Container
         this.anims.create(
             {
                 key: 'p1-death',
-                frames: this.anims.generateFrameNumbers('p1-death', { start: 1, end: 6 }),
-                frameRate: 3,
-                repeat: 1
+                frames: this.anims.generateFrameNumbers('p1-death', { start: 1, end: 2 }),
+                frameRate: 6,
+                repeat: 0
             });
 
         //Attack
         this.anims.create(
             {
                 key: 'p1-attack',
-                frames: this.anims.generateFrameNumbers('p1-attack', { start: 0, end: 6 }),
+                frames: this.anims.generateFrameNumbers('p-attack', { start: 0, end: 5 }),
                 frameRate: 10,
             });
 
@@ -119,7 +121,7 @@ class PlayerUpdate extends Phaser.GameObjects.Container
                  
                 if (player.flipX == true)
                 {
-                    weaponRange = weaponRange * -1
+                    weaponRange = -weaponRange
                     playerW.x = player.x + weaponRange; 
                 }
 
@@ -139,16 +141,11 @@ class PlayerUpdate extends Phaser.GameObjects.Container
                 playerW.x=player.x;
                 playerW.setAlpha(0);
             }
-
-        if (Date.now() > lastHitTimeEnemy + 200 == true && playerHp > 5) 
-        {
-            player.clearTint()
-        }
     }
 }
 
-//STATES
-//Idle state
+
+// IDLE
 class IdleState extends State{
   
     enter(scene){
@@ -164,6 +161,7 @@ class IdleState extends State{
             this.stateMachine.transition('dash');
             return;
         }
+
         // Transition to move
         if (left.isDown || right.isDown ){
             this.stateMachine.transition('move');
@@ -171,102 +169,217 @@ class IdleState extends State{
         }
 
         // Transition to jump
-        if (keys.up.isDown && player.body.touching.down){
+        if (keys.up.isDown && player.body.touching.down || player.body.touching.down == 'false' ){
             this.stateMachine.transition('jump');
+            return;
+        }
+
+        // Transition to attack
+        if (keys.shift.isDown || key1.isDown || key2.isDown  ){
+            this.stateMachine.transition('attack');
             return;
         }
     }
 }
 
-//Move state
+// MOVE
 class MoveState extends State {
   execute(scene) {
     const {left, right, up, down, space, shift} = keys;
     
-    // Transition to dash
+    // to dash
     if (space.isDown || space.isDown && left.isDown || space.isDown && right.down) {
+        // if(player.direction =='left' && player.body.velocity.x < 0){
+        //     player.body.setVelocityX(-moveVel + 200);
+        // }
+        // else if (player.body.velocity.x > 0) {
+        //     player.body.setVelocityX(moveVel - 200);
+        // }  
       this.stateMachine.transition('dash');
       return;
     }
     
-    // Transition to idle if not pressing movement keys
+    // to idle
     if (!(left.isDown || right.isDown || up.isDown || down.isDown)) {
       this.stateMachine.transition('idle');
       return;
     }
 
-    // Transition to jump
+    // to jump
     if (keys.up.isDown && player.body.touching.down){
         this.stateMachine.transition('jump');
         return;
     }
     
     if (left.isDown && player.body.touching.down) {
-        player.setVelocityX(-240);
+        player.setVelocityX(-moveVel);
         player.direction = 'left';
         player.anims.play('p1-walk', true).setFlipX(true);
     } 
 
     else if (right.isDown && player.body.touching.down) {
-        player.setVelocityX(240);
+        player.setVelocityX(moveVel);
         player.direction = 'right';
         player.anims.play('p1-walk', true).setFlipX(false);
     }
   }
 }
 
-//Dash state
+// DASH
 class DashState extends State {
-  enter(scene) {
-
-    if(player.direction == 'left'){
-        player.setVelocityX(-600);
+    enter(scene) {
+        player.anims.play('p1-death', true);    
     }
 
-    else{
-        player.setVelocityX(600);
+    execute(scene) {
+        dashTime+=10;
+        
+        if(keys.space.isUp){
+            if(dashTime>300){
+                dashTime=300;
+            }
+
+            if(player.direction == 'left'){
+                player.setVelocityX(-dashVel);
+            } 
+
+            else if(player.direction == 'right'){
+                player.setVelocityX(dashVel);
+            }
+
+            else if(player.direction == 'up'){
+                player.setVelocityY(-dashVel);
+            }
+
+            // //Delay transition to idle
+            scene.time.delayedCall(dashTime, () => { 
+                if(player.body.touching.down){
+                    this.stateMachine.transition('idle');
+                } else{
+                    this.stateMachine.transition('jump');
+                }
+                
+                dashTime=20;
+                
+            });          
+        }      
     }
-    
-    // Wait a third of a second and then go back to idle
-    scene.time.delayedCall(100, () => {
-      this.stateMachine.transition('idle');
-    });
-  }
 }
 
+// JUMP
 class JumpState extends State {
     enter(scene) {
     
         if (keys.up.isDown && player.body.touching.down){
-            player.setVelocityY(-550);
-            player.anims.play('p1-jump', true);  
+            player.setVelocityY(-jumpVel);
+            player.anims.play('p1-jump', true); 
+            player.direction = 'up';
+
+            scene.time.delayedCall(jumpTime, () => {  
+                player.setVelocityY(-floatVelY);
+            });   
         }  
     }
 
     execute(scene){
-        if(player.body.touching.down){
-            this.stateMachine.transition('idle');
-        } 
+        const{left, right, up, down, space, shift} = keys;
+        
+        if (keys.right.isDown){
+            player.setVelocityX(floatVelX);
+            player.anims.play('p1-jump', true).setFlipX(false);
+            player.direction = 'right';
+        }
 
-        else if (keys.right.isDown) 
-            {
-                player.setVelocityX(200);
-                player.anims.play('p1-jump', true).setFlipX(false);
-                player.direction = 'right';
-            }
-
-        else if (keys.left.isDown) 
-        {
-            player.setVelocityX(-200);
+        else if (keys.left.isDown){
+            player.setVelocityX(-floatVelX);
             player.anims.play('p1-jump', true).setFlipX(true);
             player.direction = 'left';
         }
 
-        else if (keys.down.isDown) 
-        {
-            player.setVelocityY(500);
-            player.anims.play('p1-jump', true);
+        else if (keys.up.isDown){
+            player.direction = 'up'
         }
+
+        if (keys.down.isDown){        
+            player.setVelocityY(floatVelY);
+            player.anims.play('p1-jump', true);
+            // player.direction = 'down'
+        }
+
+        //Transition to idle
+        if (player.body.touching.down){
+
+            if (left.isDown || right.isDown ){
+                this.stateMachine.transition('move');
+            return;
+
+            }
+            else{
+                this.stateMachine.transition('idle');
+            }
+            
+        } 
+
+        // Transition to dash
+        if (space.isDown || space.isDown && left.isDown || space.isDown && right.down){
+            this.stateMachine.transition('dash');
+            return;
+        }; 
+    }
+}
+
+//ATTACK
+class AttackState extends State{
+    enter(scene) {
+
+    }
+
+    execute(scene){
+        const{left, right, up, down, space, shift} = keys;
+             
+        playerW.x=player.x;
+        playerW.y=player.y; 
+        playerW.body.setSize(1, 1, 1, 1  );
+    
+        if (key1.isDown) 
+        {
+            player.anims.play('p1-attack', true);
+            var weaponRange = 24; 
+            console.log(1);
+                
+            if (player.flipX == true)
+            {
+                weaponRange = -weaponRange
+                playerW.x = player.x + weaponRange; 
+            }
+
+            else 
+            {
+                playerW.x = player.x + weaponRange;  
+            }
+
+                playerW.body.setSize(24, 8, 8, 12);
+                // playerW.setAlpha(1);         
+        }
+
+        if (key1.getDuration()>1000/15)
+        {
+            playerW.body.setSize(1, 1, 1, 1  ) ;
+            playerW.x=player.x;
+            playerW.setAlpha(0);
+        }
+
+        // to move
+        if (left.isDown || right.isDown ){
+            this.stateMachine.transition('move');
+            return;
+        }
+
+        // to idle
+        scene.time.delayedCall(attTime, () => {  
+            this.stateMachine.transition('idle');
+            return;
+        });
     }
 }
 
@@ -280,40 +393,8 @@ class JumpState extends State {
 
 
 
-
-
-
-// //Delay transition to idle
-// scene.time.delayedCall(500, () => {     
-//     this.stateMachine.transition('idle');
-// });
 
 //Generate random number
 // setInterval(function(){
 //     rNum = Phaser.Math.Between(0,300);
 // }, 1000);
-
-
-//Player alt
-// class Player extends Phaser.Physics.Arcade.Sprite {
-//   constructor (config) {
-//     super(config.scene, config.x, config.y, config.texture, config.frame);
-
-//     this.scene.add.existing(this);
-//     this.scene.physics.add.existing(this);
-
-//     // Set physics stuff on body …
-
-//     //The state machine managing the player
-//         this.stateMachine = new StateMachine('idle', {
-//             idle: new IdleState(),
-//             move: new MoveState(),
-//             dash: new DashState(),
-//         },[this, this.player]);
-//   }
-
-//     update () { 
-//     //State machine
-//         this.stateMachine.step();
-//     }
-// }

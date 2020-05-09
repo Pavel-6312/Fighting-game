@@ -10,6 +10,8 @@ class EnemyPreload extends Phaser.GameObjects.Container
         this.load.spritesheet('p2-idle', 'assets/desert-enemy/5 Mummy/Mummy_idle.png', {frameWidth: 48,frameHeight: 48,});
         this.load.spritesheet('p2-attack', 'assets/desert-enemy/5 Mummy/Mummy_attack.png', {frameWidth: 48,frameHeight: 48,});
 
+        this.load.spritesheet('e-idle', 'assets/e-idle.png', {frameWidth: 96, frameHeight: 96,})
+
     }
 }
 
@@ -25,11 +27,10 @@ class EnemyCreate extends Phaser.GameObjects.Container
         this.anims = config.scene.anims;
         this.platforms = config.scene.platforms;
         this.enemy = config.scene.enemy;
-        
-        enemy = this.physics.add.sprite(game.config.width*0.5,game.config.height/2, 'p2-walk');
-
+        enemy = this.physics.add.sprite(game.config.width*0.62+1,game.config.height/2, 'e-idle');
+    
         enemy.setCollideWorldBounds(true);
-        enemy.body.setSize(16, 48, 8, 24);
+        // enemy.body.setSize(16, 48, 8, 24);
         enemyHp=20;     
 
         //Weapon
@@ -47,11 +48,13 @@ class EnemyCreate extends Phaser.GameObjects.Container
         });
 
         this.anims.create({
-            key: 'p2-idle',
-            frames: this.anims.generateFrameNumbers('p2-idle', { start: 0, end: 4 }),
+            key: 'e-idle',
+            frames: this.anims.generateFrameNumbers('e-idle', { start: 0, end: 4 }),
             frameRate: 6,
             repeat: -1 // -1 run forever / 1 -> run once
         });
+
+        enemy.anims.play('e-idle', false);
 
         this.anims.create({
             key: 'p2-attack',
@@ -102,8 +105,8 @@ class EnemyUpdate extends Phaser.GameObjects.Container
         else 
         {
             enemy.setVelocityX(0);
-            // enemy.anims.play('p2-idle',true); 
-            enemy.anims.play('p2-attack',true); 
+            enemy.anims.play('p2-idle',true); 
+            // enemy.anims.play('p2-attack',true); 
     
                 if (enemy.flipX == false)
                 {

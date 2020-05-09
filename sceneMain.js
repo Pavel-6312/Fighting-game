@@ -18,12 +18,13 @@ class SceneMain extends Phaser.Scene {
         this.enemy = new EnemyCreate({scene:this}); 
         this.player = new PlayerCreate({scene:this});
 
-    //The state machine managing the player
+    //State machine (player)
         this.stateMachine = new StateMachine('idle', {
             idle: new IdleState(),
             move: new MoveState(),
             dash: new DashState(),
             jump: new JumpState(),
+            attack: new AttackState(),
         },[this, this.player]);
 
     //Colliders
@@ -32,17 +33,17 @@ class SceneMain extends Phaser.Scene {
 
     //Controls
         keys = this.input.keyboard.createCursorKeys();
-        keyAction1 = this.input.keyboard.addKey('X');
-        keyAction2 = this.input.keyboard.addKey('Z');
+        key1 = this.input.keyboard.addKey('X');
+        key2 = this.input.keyboard.addKey('Z');
 
     //HP text
         playerHpText = this.add.text(20 ,20 ,'Start', {
-        fontSize: '24px',
-        fontFamily: 'Arial',
-        color: '#ffffff',
-        align: 'center',
-        lineSpacing: 44,
-      });
+            fontSize: '12px',
+            fontFamily: 'Raleway',
+            color: '#ffffff',
+            align: 'center',
+            lineSpacing: 18,
+        });
     }
 
     update() {
@@ -54,7 +55,14 @@ class SceneMain extends Phaser.Scene {
     //HP text
         // playerHpText.setText('Player HP ' + playerHp + ' / ' + 'Enemy HP ' + enemyHp + ' / ' + this.stateMachine.state); 
 
-        playerHpText.setText(this.stateMachine.state + ' / ' + player.direction);
+        playerHpText.setText(
+            ' / ' + dashVel + 
+            ' / ' + dashTime +
+            ' / floarVelX ' + floatVelX + 
+            ' / ' + player.direction +  
+            ' ' + this.stateMachine.state   
+        );
+
     //End game
         if(playerHp < 1 || enemyHp < 1)
         {

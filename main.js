@@ -55,7 +55,7 @@ window.onload=function(){
                 default: "arcade",
                 arcade: {
                     gravity: {y: 1200},
-                    debug: false
+                    // debug: false
                     // debug: true
                 }
             },
@@ -79,8 +79,8 @@ var enemyW;
 
 //Controls
 var keys;
-var keyAction1;
-var keyAction2;
+var key1;
+var key2;
 
 //Environment
 var platforms;
@@ -94,3 +94,14 @@ var weaponRange;
 
 var stateMachine;
 var state;
+var dashVel = 1000;
+var dashTime = 20;
+var jumpTime = 30;
+var attTime = 600;
+var jumpVel = 2000;
+var moveVel = 250;
+
+var floatVelX = 200;
+var floatVelY = 400;
+
+var playerHp = 30;
