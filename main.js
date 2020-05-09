@@ -55,8 +55,7 @@ window.onload=function(){
                 default: "arcade",
                 arcade: {
                     gravity: {y: 1200},
-                    // debug: false
-                    // debug: true
+                    debug: true
                 }
             },
             scene: [SceneMain, SceneTitle,]
@@ -67,15 +66,17 @@ window.onload=function(){
 
 //Player
 var player;
-var playerHp;
+var playerHp=30;
 var lastHitTimePlayer = Date.now();
 var playerW;
 
+
 //Enemy
-var enemyHp;
 var enemy;
+var enemyHp =100;
 var lastHitTimeEnemy = Date.now();
 var enemyW;
+var enemyText
 
 //Controls
 var keys;
@@ -103,5 +104,5 @@ var moveVel = 180;
 
 var floatVelX = 200;
 var floatVelY = 400;
-
-var playerHp = 30;
+var weaponRange = 24;
+var rectW;

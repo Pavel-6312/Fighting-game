@@ -30,8 +30,7 @@ class EnemyCreate extends Phaser.GameObjects.Container
         enemy = this.physics.add.sprite(game.config.width*0.62+1,game.config.height/2, 'e-idle');
     
         enemy.setCollideWorldBounds(true);
-        // enemy.body.setSize(16, 48, 8, 24);
-        enemyHp=20;     
+        // enemy.body.setSize(16, 48, 8, 24);    
 
         //Weapon
         enemyW = this.physics.add.sprite(enemy.x, enemy.y, 'weapon');

@@ -40,14 +40,13 @@ class PlayerCreate extends Phaser.GameObjects.Container
         player.direction = 'right';
         player.setCollideWorldBounds(true);
         player.body.setSize(16, 48, 8, 24);// X, Y, XYOffset
-            
-        //Weapon
-        playerW = this.physics.add.sprite(player.x, player.y, 'weapon');
-        playerW.body.setAllowGravity(false);
-        playerW.setAlpha(0);
+        
+        //Rec
+        rectW = this.scene.add.graphics();
         
         //Collider
         this.physics.add.collider(player, platforms);
+        this.physics.add.collider(rectW, platforms);
 
 
         //ANIMATIONS
@@ -340,40 +339,30 @@ class AttackState extends State{
     enter(scene) {
         player.setVelocity(0);
         player.anims.play('p1-attack', true);
+
+        scene.physics.add.existing(rectW);
+        rectW.body.setAllowGravity(false);
+        rectW.body.width = 5;
+        rectW.body.height = 5;
+                rectW.y = 0;
+        
+        if (key1.isDown){ 
+        
+            if (player.direction=='left'){
+                rectW.x = player.x - weaponRange;
+                rectW.y = player.y;
+
+            }
+            else {
+                rectW.x = player.x + weaponRange;
+                rectW.y = player.y;
+            }    
+        }
     }
 
     execute(scene){
         const{left, right, up, down, space, shift} = keys;
-             
-        playerW.x=player.x;
-        playerW.y=player.y; 
-        playerW.body.setSize(1, 1, 1, 1  );
-    
-        if (key1.isDown) 
-        {
-            
-            var weaponRange = 24;
-                
-            if (player.flipX == true)
-            {
-                weaponRange = -weaponRange
-                playerW.x = player.x + weaponRange; 
-            }
-
-            else 
-            {
-                playerW.x = player.x + weaponRange;  
-            }
-
-                playerW.body.setSize(24, 8, 8, 12);         
-        }
-
-        if (key1.getDuration()>1000/15)
-        {
-            playerW.body.setSize(1, 1, 1, 1  ) ;
-            playerW.x=player.x;
-            playerW.setAlpha(0);
-        }
+        rectW.y = 0;
 
         scene.time.delayedCall(attTime, () => { 
             if (left.isDown || right.isDown ){
@@ -382,12 +371,13 @@ class AttackState extends State{
                 return;
             } 
             else if (keys.up.isDown && player.body.touching.down){
+                //to jump
                 this.stateMachine.transition('jump');
                 return;
             }
             else if ( key1.isDown ==false || key2.isDown==false  ){
                 // to idle
-                this.stateMachine.transition('idle');
+                this.stateMachine.transition('idle');  
                 return;
             }
         });

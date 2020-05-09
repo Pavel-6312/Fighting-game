@@ -28,8 +28,9 @@ class SceneMain extends Phaser.Scene {
         },[this, this.player]);
 
     //Colliders
-        this.physics.add.overlap(playerW, enemy, playerHit.bind(this));
+        // this.physics.add.overlap(playerW, enemy, playerHit.bind(this));
         this.physics.add.overlap(enemyW, player, enemyHit.bind(this));
+        this.physics.add.overlap(rectW, enemy, playerHit.bind(this));
 
     //Controls
         keys = this.input.keyboard.createCursorKeys();
@@ -38,6 +39,13 @@ class SceneMain extends Phaser.Scene {
 
     //HP text
         playerHpText = this.add.text(20 ,20 ,'Start', {
+            fontSize: '12px',
+            fontFamily: 'Raleway',
+            color: '#ffffff',
+            align: 'center',
+            lineSpacing: 18,
+        });
+        enemyText = this.add.text(20 ,40 ,'Start', {
             fontSize: '12px',
             fontFamily: 'Raleway',
             color: '#ffffff',
@@ -56,12 +64,15 @@ class SceneMain extends Phaser.Scene {
         // playerHpText.setText('Player HP ' + playerHp + ' / ' + 'Enemy HP ' + enemyHp + ' / ' + this.stateMachine.state); 
 
         playerHpText.setText(
-            ' / ' + dashVel + 
-            ' / ' + dashTime +
-            ' / floatVelX ' + floatVelX + 
+            ' / ' + playerHp + 
+            // ' / floatVelX ' + floatVelX + 
             ' / ' + player.direction +  
             ' ' + this.stateMachine.state +
             ' / attTime ' + attTime 
+        );
+
+        enemyText.setText(
+            ' / ' + enemyHp         
         );
 
     //End game
@@ -77,8 +88,8 @@ function enemyHit (player)
 {
     if (Date.now() > lastHitTimeEnemy + 1000/10 == true) 
     {
-        player.setTint(0xff0000);
-        // playerHp--;  
+        // player.setTint(0xff0000);
+        playerHp--;  
         lastHitTimeEnemy = Date.now()
     }
 }
@@ -87,7 +98,6 @@ function playerHit (enemy)
 {
     if (Date.now() > lastHitTimePlayer + 1000/15 == true) 
     {
-        enemy.setTint(0xff0000);
         enemyHp--;  
         lastHitTimePlayer = Date.now()
     }
