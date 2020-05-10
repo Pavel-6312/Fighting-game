@@ -141,13 +141,13 @@ class EnemyAttackState extends EnemyState{
         
         enemy.setVelocity(0);
         enemy.anims.play('e-attack', false);
-        
+        fireball.x = enemy.x;
+        fireball.y = enemy.y - 80;
 
         scene.time.delayedCall(attStartupTime, () => {
             if (distance < 0){
                 fireball.body.setVelocityX(-enemyProjectileVel);
-                fireball.y = player.y;
-                
+                fireball.y = player.y;  
             } 
 
             else {
@@ -157,12 +157,10 @@ class EnemyAttackState extends EnemyState{
             enemy.anims.play('e-idle', false);
         }); 
 
-        // to move
         scene.time.delayedCall(enemyAttackSpeed, () => {
-            fireball.x = enemy.x;
-            fireball.y = enemy.y;
+            
             fightDistance = Phaser.Math.Between(minFightDistance, maxFightDistance);
-            enemyAttackSpeed = 1500 + Phaser.Math.Between(-1000, 1000);
+            enemyAttackSpeed = 1500 + Phaser.Math.Between(-500, 1000);
 
             if (Math.abs(distance) > fightDistance ){
                 enemyStateMachine.transition('enemyMove');

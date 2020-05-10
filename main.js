@@ -113,7 +113,7 @@ function enemyHit (player)
 {
     if (Date.now() > lastHitTimeEnemy + 1000/10 == true) 
     {
-        // playerHp--;  
+        playerHp--;  
         player.tint = 0xff0000;
 
         setInterval(
@@ -175,7 +175,7 @@ var rectW2;
 var attTime = 500;
 var attStartupTime = 200;
 var blockTime = 300;
-var blockStartupTime = 100;
+var blockStartupTime = 0;
 
 var jumpVel = 2000;
 var jumpTime = 30;
@@ -200,7 +200,7 @@ var enemyDamageReceived;
 var minFightDistance = 80;
 var maxFightDistance = 200;
 var fightDistance = Phaser.Math.Between(minFightDistance, maxFightDistance);
-var enemyProjectileVel = 300;
+var enemyProjectileVel = 400;
 var enemyAttackSpeed = 1500;
 
 //Controls
