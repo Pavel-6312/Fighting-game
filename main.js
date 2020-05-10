@@ -94,7 +94,7 @@ window.onload=function(){
             height: 375,
             backgroundColor: 0xffffff,
             pixelArt: true, //fix blurred pixels
-            zoom: 2,
+            zoom: 1,
             physics: {
                 default: "arcade",
                 arcade: {
