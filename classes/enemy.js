@@ -113,6 +113,8 @@ class EnemyIdleState extends EnemyState{
             enemyStateMachine.transition('enemyMove');
             return;
         }
+
+        //to attack
         else {
             enemyStateMachine.transition('enemyAttack');
             return;
@@ -200,10 +202,18 @@ class EnemyAttackState extends EnemyState{
 class EnemyAvoidState extends EnemyState{
   
     enter(scene){
-        // to Idle
         scene.time.delayedCall(500, () => {
-            enemyStateMachine.transition('enemyIdle');
-            return;
+            //to stealth
+            if (enemyHp <= 5 ){
+                enemyStateMachine.transition('enemyStealth');
+                return;
+            } 
+
+            // to Idle
+            else {
+                enemyStateMachine.transition('enemyIdle');
+                return;
+            }
         });
 
         scene.physics.add.group({
@@ -225,6 +235,36 @@ class EnemyAvoidState extends EnemyState{
             enemy.setVelocityX(-enMoveVel-200);
             enemy.anims.play('e-idle', true).setFlipX(false);
         }   
+    }
+
+}
+
+//stealth
+class EnemyStealthState extends EnemyState{
+  
+    enter(scene){
+        currentDamageReceived = enemyDamageReceived;
+        enemy.setAlpha(0.5);
+
+        scene.time.delayedCall(500, () => {
+            enemy.setAlpha(0);
+            enemy.x = Phaser.Math.Between(0, 300);
+        });
+
+        scene.time.delayedCall(2500, () => {
+            enemy.setAlpha(1);
+            enemyStateMachine.transition('enemyAttack');
+            return;
+        });
+    }
+
+    execute(scene){
+        //Uncover to idle
+        if (currentDamageReceived - enemyDamageReceived < 0){
+            enemy.setAlpha(1);
+            enemyStateMachine.transition('enemyIdle');
+            return;
+        }  
     }
 
 }

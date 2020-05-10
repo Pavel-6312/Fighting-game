@@ -99,7 +99,7 @@ window.onload=function(){
                 default: "arcade",
                 arcade: {
                     gravity: {y: 1200},
-                    debug: true
+                    // debug: true
                 }
             },
             scene: [SceneMain, SceneTitle,]
@@ -125,21 +125,22 @@ function enemyHit (player)
     }
 
     // //End game
-        // if( enemyHp < 1)
-        // {
-        //     this.scene.start('SceneTitle');
-        //     winText = 'Victory!'
-        // }    
-        // else if (playerHp < 1){
-        //     this.scene.start('SceneTitle');
-        //     winText = 'You have failed...'
-        // }
+        if( enemyHp < 1)
+        {
+            this.scene.start('SceneTitle');
+            winText = 'Victory!'
+        }    
+        else if (playerHp < 1){
+            this.scene.start('SceneTitle');
+            winText = 'You have failed...'
+        }
 }
 
 function playerHit (enemy)
 {
     if (Date.now() > lastHitTimePlayer + 1000/15 == true) 
     {
+        //Decrese enemy hp
         enemyHp--;  
         enemyDamageReceived++;
         lastHitTimePlayer = Date.now()
@@ -207,6 +208,7 @@ var enemyW;
 var enemyText
 var fireball;
 var enemyDamageReceived;
+var currentDamageReceived
 
 var minFightDistance = 80;
 var maxFightDistance = 200;

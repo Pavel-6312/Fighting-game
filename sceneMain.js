@@ -27,6 +27,7 @@ class SceneMain extends Phaser.Scene {
             enemyMove: new EnemyMoveState(),
             enemyAttack: new EnemyAttackState(),
             enemyAvoid: new EnemyAvoidState(),
+            enemyStealth: new EnemyStealthState(),
         },[this, this.enemy]);  
 
     //Sprites
@@ -38,7 +39,7 @@ class SceneMain extends Phaser.Scene {
     //Colliders
         this.physics.add.overlap(player, fireball, enemyHit.bind(this));
         this.physics.add.overlap(player, projectiles, enemyHit.bind(this));
-        
+
         this.physics.add.overlap(enemy, rectW, playerHit.bind(this));
         this.physics.add.collider(rectW2, fireball, playerKnockback.bind(this));
         
