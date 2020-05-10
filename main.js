@@ -99,7 +99,7 @@ window.onload=function(){
                 default: "arcade",
                 arcade: {
                     gravity: {y: 1200},
-                    // debug: true
+                    debug: true
                 }
             },
             scene: [SceneMain, SceneTitle,]
@@ -124,16 +124,16 @@ function enemyHit (player)
         lastHitTimeEnemy = Date.now()
     }
 
-    //End game
-        if( enemyHp < 1)
-        {
-            this.scene.start('SceneTitle');
-            winText = 'Victory!'
-        }    
-        else if (playerHp < 1){
-            this.scene.start('SceneTitle');
-            winText = 'You have failed...'
-        }
+    // //End game
+        // if( enemyHp < 1)
+        // {
+        //     this.scene.start('SceneTitle');
+        //     winText = 'Victory!'
+        // }    
+        // else if (playerHp < 1){
+        //     this.scene.start('SceneTitle');
+        //     winText = 'You have failed...'
+        // }
 }
 
 function playerHit (enemy)
@@ -152,15 +152,15 @@ function playerHit (enemy)
         );
     }
     //End game
-    if( enemyHp < 1)
-    {
-        this.scene.start('SceneTitle');
-        winText = 'Victory!'
-    }    
-    else if (playerHp < 1){
-        this.scene.start('SceneTitle');
-        winText = 'You have failed...'
-    }
+    // if( enemyHp < 1)
+    // {
+    //     this.scene.start('SceneTitle');
+    //     winText = 'Victory!'
+    // }    
+    // else if (playerHp < 1){
+    //     this.scene.start('SceneTitle');
+    //     winText = 'You have failed...'
+    // }
 }
 
 //Knockback player when blocked
@@ -213,6 +213,8 @@ var maxFightDistance = 200;
 var fightDistance = Phaser.Math.Between(minFightDistance, maxFightDistance);
 var enemyProjectileVel = 400;
 var enemyAttackSpeed = 1500;
+
+var projectiles
 
 //Controls
 var keys;

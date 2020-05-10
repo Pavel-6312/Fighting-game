@@ -34,14 +34,28 @@ class EnemyCreate extends Phaser.GameObjects.Container
         enemyHp =10;
         enemyDamageReceived = 0;
 
+//Fireballs
         fireball = this.physics.add.sprite(game.config.width/2, game.config.height/2, 'fireball');
         fireball.body.setAllowGravity(false);
         fireball.body.setBounce(0.1, 0.1);
 
+        projectiles = this.physics.add.group({
+            key: 'fireball',
+            repeat: 10,
+            setXY: { x: 12, y: 0, stepX: 70 }
+        });
+
+//Add props to sprites
+        projectiles.children.iterate(function (child) {
+            child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
+
+        });
 
         fireball.setCollideWorldBounds(true);
         fireball.body.setVelocityX(Phaser.Math.Between(-100,100));
         fireball.setVelocityY(20);
+
+        
        
         //Collider
         this.physics.add.collider(enemy, platforms);
@@ -191,6 +205,13 @@ class EnemyAvoidState extends EnemyState{
             enemyStateMachine.transition('enemyIdle');
             return;
         });
+
+        scene.physics.add.group({
+            key: 'fireball',
+            repeat: 22,
+            setXY: { x: 12, y: 0, stepX: 30 }
+        });
+          
     }
 
     execute(scene){
