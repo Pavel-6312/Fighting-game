@@ -94,7 +94,7 @@ window.onload=function(){
             height: 375,
             backgroundColor: 0xffffff,
             pixelArt: true, //fix blurred pixels
-            zoom: 1,
+            zoom: 2,
             physics: {
                 default: "arcade",
                 arcade: {
@@ -162,6 +162,17 @@ function playerHit (enemy)
         winText = 'You have failed...'
     }
 }
+
+//Knockback player when blocked
+function playerKnockback(){
+    if(player.flipX ==false){
+        player.setVelocityX(-blockTime);
+    }
+    else {
+        player.setVelocityX(blockTime);
+    }
+}
+
 
 //Player
 var player;

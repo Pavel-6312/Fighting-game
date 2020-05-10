@@ -40,14 +40,11 @@ class PlayerCreate extends Phaser.GameObjects.Container
         player.direction = 'right';
         player.setCollideWorldBounds(true);
         player.body.setSize(16, 36, 1, 1);// X, Y, XYOffset
-        playerHp=10;
+        playerHp=5;
         
-
         //Rec
         rectW = this.scene.add.graphics();
         rectW2 = this.scene.add.graphics();
-        
-        
         
         //Collider
         this.physics.add.collider(player, platforms);
@@ -418,7 +415,7 @@ class BlockState extends State{
         rectW2.body.setAllowGravity(false);
         rectW2.body.immovable = true;
         
-        rectW2.body.width = 5;
+        rectW2.body.width = 8;
         rectW2.body.height = 36;
         
 
