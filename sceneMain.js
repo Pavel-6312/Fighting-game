@@ -4,33 +4,41 @@ class SceneMain extends Phaser.Scene {
         super('SceneMain');
     }
 
-    preload() {
-        this.load.image('bg', 'assets/bg.png');
+    preload() { 
         new PlatformsPreload({scene:this}); 
         new PlayerPreload({scene:this}); 
         new EnemyPreload({scene:this}); 
     }
 
-    create() {     
+    create() {   
+    //State machine (player)
+        stateMachine = new StateMachine('idle', {
+            idle: new IdleState(),
+            move: new MoveState(),
+            dash: new DashState(),
+            jump: new JumpState(),
+            attack: new AttackState(),
+            block: new BlockState(),
+        },[this, this.player]);  
+
+    //State machine (enemy)
+        enemyStateMachine = new EnemyStateMachine('enemyAttack', {
+            enemyIdle: new EnemyIdleState(),
+            enemyMove: new EnemyMoveState(),
+            enemyAttack: new EnemyAttackState(),
+            enemyAvoid: new EnemyAvoidState(),
+        },[this, this.enemy]);  
+
     //Sprites
         this.add.image(game.config.width/2, game.config.height/2, 'bg');
         this.platforms = new PlatformsCreate({scene:this});
         this.enemy = new EnemyCreate({scene:this}); 
         this.player = new PlayerCreate({scene:this});
 
-    //State machine (player)
-        this.stateMachine = new StateMachine('idle', {
-            idle: new IdleState(),
-            move: new MoveState(),
-            dash: new DashState(),
-            jump: new JumpState(),
-            attack: new AttackState(),
-        },[this, this.player]);
-
     //Colliders
-        // this.physics.add.overlap(playerW, enemy, playerHit.bind(this));
-        this.physics.add.overlap(enemyW, player, enemyHit.bind(this));
-        this.physics.add.overlap(rectW, enemy, playerHit.bind(this));
+        this.physics.add.overlap(player, fireball, enemyHit.bind(this));
+        this.physics.add.overlap(enemy, rectW, playerHit.bind(this));
+        this.physics.add.collider(rectW2, fireball);
 
     //Controls
         keys = this.input.keyboard.createCursorKeys();
@@ -38,67 +46,43 @@ class SceneMain extends Phaser.Scene {
         key2 = this.input.keyboard.addKey('Z');
 
     //HP text
-        playerHpText = this.add.text(20 ,20 ,'Start', {
+        playerText = this.add.text(20 ,20 ,'Start', {
             fontSize: '12px',
             fontFamily: 'Raleway',
             color: '#ffffff',
-            align: 'center',
-            lineSpacing: 18,
-        });
-        enemyText = this.add.text(20 ,40 ,'Start', {
-            fontSize: '12px',
-            fontFamily: 'Raleway',
-            color: '#ffffff',
-            align: 'center',
-            lineSpacing: 18,
+            align: 'left',
+            lineSpacing: 8,
         });
     }
 
     update() {
     //Movement
-        // new EnemyUpdate({scene:this}); 
-        // new PlayerUpdate({scene:this});
+        new EnemyUpdate({scene:this}); 
+        new PlayerUpdate({scene:this});
+        distance = player.x - enemy.x;
+        
+    //Text 
+        playerText.setText(
+            'Player Hp: ' + playerHp + 
+            // // ' / floatVelX ' + floatVelX + 
+            // ' / ' + player.direction +  
+            // ' / attTime' + attTime +
+            // ' / ' + player.state +
+            // ' / ' + player.body.enable +
+            // // ' / ' + rectW2.body.moves +
+            // ' ' + stateMachine.state + 
+            '\n'+
 
-        this.stateMachine.step();
-    //HP text
-        // playerHpText.setText('Player HP ' + playerHp + ' / ' + 'Enemy HP ' + enemyHp + ' / ' + this.stateMachine.state); 
-
-        playerHpText.setText(
-            ' / ' + playerHp + 
-            // ' / floatVelX ' + floatVelX + 
-            ' / ' + player.direction +  
-            ' ' + this.stateMachine.state +
-            ' / attTime ' + attTime 
+            'Enemy Hp: ' + enemyHp  +
+            ' ' + enemyStateMachine.state  +
+            ' / ' + enemyDamageReceived  +
+            // ' / ' + enemy.body.velocity.x +
+            // ' / ' + fightDistance +
+            // ' / ' + enemyAttackSpeed +
+            ' '
         );
 
-        enemyText.setText(
-            ' / ' + enemyHp         
-        );
-
-    //End game
-        if(playerHp < 1 || enemyHp < 1)
-        {
-            this.scene.start('SceneTitle');
-        }    
     }
 }
 
-//Lower HP if hit
-function enemyHit (player)
-{
-    if (Date.now() > lastHitTimeEnemy + 1000/10 == true) 
-    {
-        // player.setTint(0xff0000);
-        playerHp--;  
-        lastHitTimeEnemy = Date.now()
-    }
-}
 
-function playerHit (enemy)
-{
-    if (Date.now() > lastHitTimePlayer + 1000/15 == true) 
-    {
-        enemyHp--;  
-        lastHitTimePlayer = Date.now()
-    }
-}

@@ -7,6 +7,7 @@ class PlatformsPreload extends Phaser.GameObjects.Container
         
         this.load.image('platform', 'assets/platform.png');
         this.load.image('platform-sm', 'assets/platform-sm.png');
+        this.load.image('bg', 'assets/bg.png');
     }
 };
 
