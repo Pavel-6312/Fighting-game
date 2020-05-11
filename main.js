@@ -152,16 +152,16 @@ function playerHit (enemy)
             250
         );
     }
-    //End game
-    // if( enemyHp < 1)
-    // {
-    //     this.scene.start('SceneTitle');
-    //     winText = 'Victory!'
-    // }    
-    // else if (playerHp < 1){
-    //     this.scene.start('SceneTitle');
-    //     winText = 'You have failed...'
-    // }
+    // End game
+    if( enemyHp < 1)
+    {
+        this.scene.start('SceneTitle');
+        winText = 'Victory!'
+    }    
+    else if (playerHp < 1){
+        this.scene.start('SceneTitle');
+        winText = 'You have failed...'
+    }
 }
 
 //Knockback player when blocked
@@ -173,7 +173,6 @@ function playerKnockback(){
         player.setVelocityX(blockTime);
     }
 }
-
 
 //Player
 var player;
