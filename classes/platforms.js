@@ -21,6 +21,6 @@ class PlatformsCreate extends Phaser.GameObjects.Container
         this.physics = config.scene.physics;
         this.platforms = config.scene.platforms;
         platforms = this.physics.add.staticGroup();
-        platforms.create(408, game.config.height - 24, 'platform');
+        platforms.create(406, game.config.height - 24, 'platform');
     }
 };
