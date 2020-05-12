@@ -39,12 +39,6 @@ class EnemyCreate extends Phaser.GameObjects.Container
         fireball.body.setAllowGravity(false);
         fireball.body.setBounce(0.1, 0.1);
 
-//Add props to sprites
-        // fireballs.children.iterate(function (child) {
-        //     child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
-        //     child.body.setAllowGravity(false);
-        // });
-
         fireball.setCollideWorldBounds(true);
         fireball.body.setVelocityX(Phaser.Math.Between(-100,100));
         fireball.setVelocityY(20);
@@ -213,8 +207,19 @@ class EnemyAvoidState extends EnemyState{
     //Fireball aoe, move to a state
         fireballs = scene.physics.add.group({
             key: 'fireball',
-            repeat: 5,
-            setXY: { x: player.x-60, y: 0, stepX: 20}
+            repeat: Phaser.Math.Between(3, 5),
+            setXY: { x: player.x-60, y: Phaser.Math.Between(120, 220), stepX: Phaser.Math.Between(20, 40), stepY: Phaser.Math.Between(-40, 10)}
+        });
+
+        //Add props to sprites
+        fireballs.children.iterate(function (child) {
+            child.body.setAllowGravity(false);
+        });
+
+        scene.time.delayedCall(350, () => {
+            fireballs.children.iterate(function (child) {
+                child.body.setAllowGravity(true);
+            });
         });
     //Collider
         scene.physics.add.overlap(player, fireballs, enemyHit.bind(this));     
