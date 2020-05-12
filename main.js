@@ -113,7 +113,7 @@ function enemyHit (player)
 {
     if (Date.now() > lastHitTimeEnemy + 200 == true) 
     {
-        // playerHp--;  
+        playerHp--;  
         player.tint = 0xff0000;
 
         setInterval(
