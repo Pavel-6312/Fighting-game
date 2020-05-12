@@ -4,26 +4,27 @@ class SceneTitle extends Phaser.Scene {
     }
     
     preload()
-    {
-    	
+    {   
+        this.load.image('bg-win', 'assets/bg-win.png');
+        this.load.image('bg-loose', 'assets/bg-loose.png');
     }
 
     create() {
-        this.text=this.add.text(game.config.width/2 ,game.config.height/2-80 ,'Game title',{color:0xff0000});
-        this.text.setOrigin(0.5,0.5);
+        keys = this.input.keyboard.createCursorKeys();
 
-        this.text=this.add.text(game.config.width/2 ,game.config.height/2-100 ,winText,{color:0xff0000});
-        this.text.setOrigin(0.5,0.5);
+        if(playerHp>enemyHp){
+            this.add.image(game.config.width/2, game.config.height/2, 'bg-win');
 
-
-        this.text=this.add.text(game.config.width/2 ,game.config.height/2 ,'Press to Play',{color:0xff0000});
-        this.text.setInteractive();
-        this.text.on('pointerdown', () => this.scene.start('SceneMain'));
-        this.text.setOrigin(0.5,0.5);
+        } else {
+            this.add.image(game.config.width/2, game.config.height/2, 'bg-loose');
+        }
     }
 
-    update() 
+    update()     
     {
-
+        const{left, right, up, down, space, shift} = keys;
+        if(space.isDown){
+            this.scene.start('SceneMain');
+        }
     }
 }

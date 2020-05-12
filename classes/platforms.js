@@ -16,6 +16,7 @@ class PlatformsCreate extends Phaser.GameObjects.Container
     constructor(config)
     {
         super(config.scene);
+        
 
         this.scene = config.scene;
         this.physics = config.scene.physics;

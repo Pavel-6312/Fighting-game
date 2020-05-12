@@ -111,7 +111,7 @@ window.onload=function(){
 //Lower HP if hit
 function enemyHit (player)
 {
-    if (Date.now() > lastHitTimeEnemy + 1000/10 == true) 
+    if (Date.now() > lastHitTimeEnemy + 200 == true) 
     {
         playerHp--;  
         player.tint = 0xff0000;
@@ -124,16 +124,11 @@ function enemyHit (player)
         lastHitTimeEnemy = Date.now()
     }
 
-    // //End game
-        if( enemyHp < 1)
-        {
-            this.scene.start('SceneTitle');
-            winText = 'Victory!'
-        }    
-        else if (playerHp < 1){
-            this.scene.start('SceneTitle');
-            winText = 'You have failed...'
-        }
+    //End game
+    if( enemyHp < 1 || playerHp < 1)
+    {
+        game.scene.start('SceneTitle');
+    }
 }
 
 function playerHit (enemy)
@@ -152,15 +147,11 @@ function playerHit (enemy)
             250
         );
     }
-    // End game
-    if( enemyHp < 1)
+
+    //End game
+    if( enemyHp < 1 || playerHp < 1)
     {
-        this.scene.start('SceneTitle');
-        winText = 'Victory!'
-    }    
-    else if (playerHp < 1){
-        this.scene.start('SceneTitle');
-        winText = 'You have failed...'
+        game.scene.start('SceneTitle');
     }
 }
 
@@ -215,7 +206,7 @@ var fightDistance = Phaser.Math.Between(minFightDistance, maxFightDistance);
 var enemyProjectileVel = 400;
 var enemyAttackSpeed = 1500;
 
-var projectiles
+var fireballs;
 
 //Controls
 var keys;
@@ -231,7 +222,6 @@ var distance;
 var speed;
 
 var playerText;
-var winText = '-';
 
 var stateMachine;
 var enemyStateMachine;

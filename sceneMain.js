@@ -38,11 +38,10 @@ class SceneMain extends Phaser.Scene {
 
     //Colliders
         this.physics.add.overlap(player, fireball, enemyHit.bind(this));
-        this.physics.add.overlap(player, projectiles, enemyHit.bind(this));
+        
 
         this.physics.add.overlap(enemy, rectW, playerHit.bind(this));
         this.physics.add.collider(rectW2, fireball, playerKnockback.bind(this));
-        
 
     //Controls
         keys = this.input.keyboard.createCursorKeys();
@@ -78,8 +77,8 @@ class SceneMain extends Phaser.Scene {
             '\n'+
 
             'Enemy Hp: ' + enemyHp  +
-            ' ' + enemyStateMachine.state  +
-            ' / ' + enemyDamageReceived  +
+            // ' ' + enemyStateMachine.state  +
+            // ' / ' + enemyDamageReceived  +
             // ' / ' + enemy.body.velocity.x +
             // ' / ' + fightDistance +
             // ' / ' + enemyAttackSpeed +
