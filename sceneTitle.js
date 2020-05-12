@@ -12,10 +12,11 @@ class SceneTitle extends Phaser.Scene {
     create() {
         keys = this.input.keyboard.createCursorKeys();
 
-        if(playerHp>enemyHp){
+        if(playerHp > enemyHp){
             this.add.image(game.config.width/2, game.config.height/2, 'bg-win');
 
-        } else {
+        }  
+        else if (playerHp < enemyHp){
             this.add.image(game.config.width/2, game.config.height/2, 'bg-loose');
         }
     }
@@ -23,7 +24,8 @@ class SceneTitle extends Phaser.Scene {
     update()     
     {
         const{left, right, up, down, space, shift} = keys;
-        if(space.isDown){
+
+        if(space.isDown == true){
             this.scene.start('SceneMain');
         }
     }
