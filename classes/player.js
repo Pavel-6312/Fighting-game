@@ -40,7 +40,7 @@ class PlayerCreate extends Phaser.GameObjects.Container
         player.direction = 'right';
         player.setCollideWorldBounds(true);
         player.body.setSize(16, 36, 1, 1);// X, Y, XYOffset
-        playerHp=25;
+        playerHp=15;
         
         //Rec
         rectW = this.scene.add.graphics();
