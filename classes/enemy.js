@@ -34,16 +34,32 @@ class EnemyCreate extends Phaser.GameObjects.Container
         enemyHp =10;
         enemyDamageReceived = 0;
 
-//Fireballs
+    //Fireballs
         fireball = this.physics.add.sprite(game.config.width/2, game.config.height/2, 'fireball');
-        fireball.body.setAllowGravity(false);
+        // fireball.body.setAllowGravity(false);
         fireball.body.setBounce(0.1, 0.1);
 
         fireball.setCollideWorldBounds(true);
-        fireball.body.setVelocityX(Phaser.Math.Between(-100,100));
-        fireball.setVelocityY(20);
-     
-        //Collider
+        // fireball.body.setVelocityX(Phaser.Math.Between(-100,100));
+        // fireball.setVelocityY(20);
+
+    //Create projectiles
+        projectiles = this.scene.physics.add.group({
+            key: 'fireball',
+            repeat: Phaser.Math.Between(2, 3),
+            setXY: { x: enemy.x +100, y: enemy.y +100, 
+            stepX: Phaser.Math.Between(40, 40), 
+            stepY: Phaser.Math.Between(10, 10)}
+        });
+
+    //Add props to sprites
+        projectiles.children.iterate(function (child) {
+            child.body.setAllowGravity(false);
+            child.body.setVelocityY(0);
+            child.body.setCollideWorldBounds(true);
+        });
+
+    // collider
         this.physics.add.collider(enemy, platforms);
         this.physics.add.collider(fireball, platforms);
         
@@ -82,6 +98,11 @@ class EnemyUpdate extends Phaser.GameObjects.Container
     {
         super(config.scene);
         enemyStateMachine.step();
+
+        //Rotate fireballs around target
+        Phaser.Actions.RotateAround(
+            projectiles.getChildren(), { x:game.config.width/2, y: game.config.height/2}, 0.03
+        );
     }
 }
 
@@ -113,21 +134,50 @@ class EnemyIdleState extends EnemyState{
 class EnemyMoveState extends EnemyState{
   
     enter(scene){
-        
 
+        //Fly
+        // enemy.setVelocityY(Phaser.Math.Between(-100, -200));
+        // enemy.body.setAllowGravity(false);
+        // enemy.setGravityY(-1000);
+        
+        //bounce
+        // enemy.body.velocity.setTo(0, 400);
+        // enemy.body.bounce.set(0.9);
+        // enemy.body.gravity.set(0, -600);
+
+        //follow left
         if (distance < -fightDistance){
             enemy.setVelocityX(-enMoveVel);
             enemy.anims.play('e-idle', true).setFlipX(false); 
         } 
 
-        //Follow right
+        //follow right
         else if (distance > fightDistance){
             enemy.setVelocityX(enMoveVel);
             enemy.anims.play('e-idle', true).setFlipX(true);
-        }      
+        }  
+
+        //to teleport if stuck for 10s
+        var stateNow = enemyStateMachine.state;
+
+        scene.time.delayedCall(10000, () => {
+            if(distance > fightDistance && stateNow == 'enemyMove' || distance < -fightDistance && stateNow == 'enemyMove'){
+                enemyStateMachine.transition('enemyTeleport');
+                return;
+            }
+        });    
     }
 
     execute(scene){
+
+        if (enemy.body.touching.left == true){
+            enemy.setVelocityY(-enemyJumpVel);
+            enemy.setVelocityX(-enMoveVel);
+        } 
+        else if (enemy.body.touching.right == true){
+            enemy.setVelocityY(-enemyJumpVel);
+            enemy.setVelocityX(enMoveVel);
+        }
 
         // to move
         if (Math.abs(distance) <= fightDistance ){
@@ -144,18 +194,35 @@ class EnemyAttackState extends EnemyState{
         
         enemy.setVelocity(0);
         enemy.anims.play('e-attack', false);
-        fireball.x = enemy.x;
-        fireball.y = enemy.y - 80;
+
+        
 
         scene.time.delayedCall(attStartupTime, () => {
             if (distance < 0){
-                fireball.body.setVelocityX(-enemyProjectileVel);
-                fireball.y = player.y;  
+
+                //Shoot projectile into player
+                // fireball.body.setVelocityX(-enemyProjectileVel);
+                // fireball.y = player.y;
+
+                //Move projcetile towards player
+                scene.tweens.add({
+                    targets: fireball,
+                    x: player.x,
+                    y: player.y,
+                    ease: 'Power1',
+                    duration: 1000,
+                    // yoyo: true,
+                    // repeat: 1,
+                });  
             } 
 
             else {
+                //Reset projectile position
+                fireball.x = enemy.x;
+                fireball.y = enemy.y - 80;
+
                 fireball.body.setVelocityX(enemyProjectileVel);
-                fireball.y = player.y;
+                fireball.y = player.y; 
             } 
             enemy.anims.play('e-idle', false);
         }); 
@@ -204,28 +271,43 @@ class EnemyAvoidState extends EnemyState{
             }
         });
 
-    //Fireball aoe, move to a state
+        //Create fireballs
         fireballs = scene.physics.add.group({
             key: 'fireball',
             repeat: Phaser.Math.Between(3, 5),
             setXY: { x: player.x-60, y: Phaser.Math.Between(120, 220), stepX: Phaser.Math.Between(20, 40), stepY: Phaser.Math.Between(-40, 10)}
         });
 
+        //Collider with platform
+        scene.physics.add.collider(fireballs, platforms);
+
         //Add props to sprites
         fireballs.children.iterate(function (child) {
             child.body.setAllowGravity(false);
         });
 
+        //Drop fireballs
         scene.time.delayedCall(350, () => {
             fireballs.children.iterate(function (child) {
                 child.body.setAllowGravity(true);
+                child.body.bounce.set(0.5);
             });
         });
-    //Collider
-        scene.physics.add.overlap(player, fireballs, enemyHit.bind(this));     
+        
+        //Destroy fireballs
+        scene.time.delayedCall(2000, () => {
+            fireballs.children.iterate(function (child) {
+                child.body.destroy();
+                child.setAlpha(0);
+            });
+        });
+
+        //Collider  
+        scene.physics.add.overlap(player, fireballs, enemyHit.bind(this));          
     }
 
     execute(scene){
+
         if (distance < 0){
             enemy.setVelocityX(enMoveVel+200);
             enemy.anims.play('e-idle', true).setFlipX(true); 
@@ -268,4 +350,23 @@ class EnemyStealthState extends EnemyState{
         }  
     }
 
+}
+
+//teleport
+class EnemyTeleportState extends EnemyState{
+  
+    enter(scene){
+        enemy.tint = 0x0000ff;
+
+        scene.time.delayedCall(500, () => {
+            enemy.y = player.y -20;
+            enemy.x = player.x +40;
+            enemy.tint = 0xffffff;
+        });
+    }
+
+    execute(scene){
+        //to idle
+        enemyStateMachine.transition('enemyIdle');  
+    }
 }

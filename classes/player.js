@@ -40,7 +40,7 @@ class PlayerCreate extends Phaser.GameObjects.Container
         player.direction = 'right';
         player.setCollideWorldBounds(true);
         player.body.setSize(16, 36, 1, 1);// X, Y, XYOffset
-        playerHp=5;
+        playerHp=25;
         
         //Rec
         rectW = this.scene.add.graphics();
@@ -136,6 +136,10 @@ class IdleState extends State{
 
     execute(scene){
         const{left, right, up, down, space, shift} = keys;
+        // if(player.setVelocityX != 0){
+            
+        //     player.setVelocityX();
+        // }
 
         //to dash
         if (space.isDown || space.isDown && left.isDown || space.isDown && right.down){
@@ -288,43 +292,52 @@ class JumpState extends State {
 
     execute(scene){
         const{left, right, up, down, space, shift} = keys;
-        
-        if (keys.right.isDown){
+        // float r
+        if (player.body.touching.down==false && keys.right.isDown){
             player.setVelocityX(floatVelX);
             player.anims.play('p1-jump', true).setFlipX(false);
             player.direction = 'right';
         }
 
-        else if (keys.left.isDown){
+        // float l
+        else if (player.body.touching.down==false && keys.left.isDown){
             player.setVelocityX(-floatVelX);
             player.anims.play('p1-jump', true).setFlipX(true);
             player.direction = 'left';
         }
 
-        else if (keys.up.isDown){
+        else if (player.body.touching.down==false){
             player.direction = 'up'
+        } 
+        
+        else {
+            player.setVelocity(0);
+            player.anims.play('p1-idle', true);
         }
 
+        //fall down
         if (keys.down.isDown){        
             player.setVelocityY(floatVelY);
             player.anims.play('p1-jump', true);
             // player.direction = 'down'
         }
 
-        //Transition to idle
-        if (player.body.touching.down){
-
-            if (left.isDown || right.isDown ){
-                this.stateMachine.transition('move');
-            return;
-
-            }
-            else{
-                this.stateMachine.transition('idle');
-            }  
+        // to idle
+        if (player.body.touching.down && keys.up.isUp){
+            this.stateMachine.transition('idle'); 
         } 
 
-        // Transition to dash
+        else if (
+            player.body.touching.down && left.isDown && keys.up.isUp
+            || 
+            player.body.touching.down && right.isDown && keys.up.isUp
+        )
+        {
+            this.stateMachine.transition('move');
+            return;
+        }
+
+        // to dash
         if (space.isDown || space.isDown && left.isDown || space.isDown && right.down){
             this.stateMachine.transition('dash');
             return;
@@ -336,9 +349,29 @@ class JumpState extends State {
             return;
         } 
 
-        //to block
+        // to block
         if ( key2.isDown ){
             this.stateMachine.transition('block');
+            return;
+        }
+
+        if (player.body.touching.down){
+            playerTouchedDown = true;
+        }
+
+        // to climb
+        if (
+                keys.left.isDown && 
+                player.body.touching.left && 
+                player.body.touching.down ==false &&
+                playerTouchedDown == true
+                || 
+                player.body.touching.right && 
+                keys.right.isDown && 
+                player.body.touching.down ==false &&
+                playerTouchedDown == true
+            ){ 
+                this.stateMachine.transition('climb');
             return;
         }
     }
@@ -405,9 +438,9 @@ class BlockState extends State{
     enter(scene) {
 
         //If jumping reduce vel after timer
-        scene.time.delayedCall(attStartupTime, () => {
-            player.setVelocity(0);
-        });
+        // scene.time.delayedCall(attStartupTime, () => {
+        //     player.setVelocity(0);
+        // });
 
         player.anims.play('p1-block', true);
 
@@ -418,7 +451,6 @@ class BlockState extends State{
         rectW2.body.width = 8;
         rectW2.body.height = 36;
         
-
         if (key2.isDown){ 
             scene.time.delayedCall(blockStartupTime, () => {
                 //Right
@@ -432,31 +464,109 @@ class BlockState extends State{
                 }
                 rectW2.y = player.y - rectW2.body.height/2; 
             });
-        }
+        }        
+    }
 
+    execute(scene) {
         const{left, right, up, down, space, shift} = keys;
 
-            if (left.isDown || right.isDown ){
-                // to move
-                rectW2.y=game.config.height-5;
-                this.stateMachine.transition('move');
-                return;
-            } 
-            else if (keys.up.isDown && player.body.touching.down){
-                //to jump
-                rectW2.y=game.config.height-5;
-                this.stateMachine.transition('jump');
-                return;
-            }
-            else{
-                scene.time.delayedCall(blockTime, () => {
-                    if(key2.isUp){ 
-                        rectW2.y=game.config.height-5;
-                    }
-                    this.stateMachine.transition('idle');
-                    return;      
-                });
-            }
+        // to move
+        if (left.isDown || right.isDown ){
+            rectW2.y=game.config.height-5;
+            this.stateMachine.transition('move');
+            return;
+        } 
+
+        //to jump
+        else if (keys.up.isDown && player.body.touching.down){
+            rectW2.y=game.config.height-5;
+            this.stateMachine.transition('jump');
+            return;
+        }
+
+        // to idle
+        else{
+            scene.time.delayedCall(blockTime, () => {
+                if(key2.isUp){ 
+                    rectW2.y=game.config.height-5;
+                }
+                this.stateMachine.transition('idle');
+                return;      
+            });
+        }
+    }
+}
+
+//climb
+class ClimbState extends State{
+    enter(scene) {
+        player.setVelocityY(0); 
+        player.body.setAllowGravity(false);
+
+        //only wall jump after touching ground
+        playerTouchedDown = false;
+    }
+
+    execute(scene) {  
+
+        // hold left
+        if (keys.left.isDown && player.body.touching.left && keys.up.isUp || keys.left.isDown && player.body.touching.left && keys.up.isDown){ 
+            player.setVelocityY(0); 
+            player.setVelocityX(-1); 
+
+            //to walljump
+            this.stateMachine.transition('walljump');
+            return;
+        } 
+
+        // hold right
+        else if (keys.right.isDown && player.body.touching.right && keys.up.isUp || player.body.touching.right && keys.right.isDown && keys.up.isDown){
+            player.setVelocityY(0); 
+            player.setVelocityX(1); 
+
+            // to walljump
+            this.stateMachine.transition('walljump');
+            return;
+        } 
+
+        //to jump
+        else {
+            player.body.setAllowGravity(true);
+            this.stateMachine.transition('jump');
+            return;
+        }
+    }
+}
+
+//wall jump
+class WallJump extends State{
+    enter(scene) {
+    }
+
+    execute(scene) {
+        const{left, right, up, down, space, shift} = keys;
         
+        if (keys.up.isDown){ 
+              
+            player.body.setAllowGravity(true);
+
+            if(player.direction == 'left'){
+                player.setVelocityY(-floatVelY*0.75);
+                player.setVelocityX(floatVelX*0.75);
+            } 
+            else if (player.direction == 'right'){
+                player.setVelocityY(-floatVelY*0.75);
+                player.setVelocityX(-floatVelX*0.75);
+            }
+            
+            this.stateMachine.transition('jump');
+            return; 
+        } 
+        else if (keys.down.isDown){
+            player.body.setAllowGravity(true);
+
+            this.stateMachine.transition('idle');
+            return; 
+        }
     }
 }

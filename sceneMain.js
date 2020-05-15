@@ -11,7 +11,7 @@ class SceneMain extends Phaser.Scene {
     }
 
     create() {   
-    //State machine (player)
+    //Player state machine
         stateMachine = new StateMachine('idle', {
             idle: new IdleState(),
             move: new MoveState(),
@@ -19,15 +19,18 @@ class SceneMain extends Phaser.Scene {
             jump: new JumpState(),
             attack: new AttackState(),
             block: new BlockState(),
+            climb: new ClimbState(),
+            walljump: new WallJump(),
         },[this, this.player]);  
 
-    //State machine (enemy)
+    //Enemy state machine
         enemyStateMachine = new EnemyStateMachine('enemyAttack', {
             enemyIdle: new EnemyIdleState(),
             enemyMove: new EnemyMoveState(),
             enemyAttack: new EnemyAttackState(),
             enemyAvoid: new EnemyAvoidState(),
             enemyStealth: new EnemyStealthState(),
+            enemyTeleport: new EnemyTeleportState(),
         },[this, this.enemy]);  
 
     //Sprites
@@ -38,6 +41,7 @@ class SceneMain extends Phaser.Scene {
 
     //Colliders
         this.physics.add.overlap(player, fireball, enemyHit.bind(this));
+        this.physics.add.overlap(player, projectiles, enemyHit.bind(this));
         
 
         this.physics.add.overlap(enemy, rectW, playerHit.bind(this));
@@ -62,24 +66,27 @@ class SceneMain extends Phaser.Scene {
     //Movement
         new EnemyUpdate({scene:this}); 
         new PlayerUpdate({scene:this});
+        new PlatformsUpdate({scene:this});
         distance = player.x - enemy.x;
         
     //Text 
         playerText.setText(
             'Player Hp: ' + playerHp + 
             // // ' / floatVelX ' + floatVelX + 
-            // ' / ' + player.direction +  
+            // ' / direction  ' + player.direction +  
             // ' / attTime' + attTime +
             // ' / ' + player.state +
             // ' / ' + player.body.enable +
             // // ' / ' + rectW2.body.moves +
-            // ' ' + stateMachine.state + 
+            // ' / TL' + player.body.touching.left +
+            // ' / TD' + player.body.touching.down +
+            // ' / ' + stateMachine.state + 
             '\n'+
 
             'Enemy Hp: ' + enemyHp  +
             // ' ' + enemyStateMachine.state  +
             // ' / ' + enemyDamageReceived  +
-            // ' / ' + enemy.body.velocity.x +
+            // ' / ' + enemy.body.blocked.left +
             // ' / ' + fightDistance +
             // ' / ' + enemyAttackSpeed +
             ' '

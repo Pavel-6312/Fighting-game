@@ -189,6 +189,8 @@ var enMoveVel = 100;
 var dashVel = 1000;
 var dashTime = 20;
 
+var playerTouchedDown = true;
+
 
 //Enemy
 var enemy;
@@ -205,8 +207,10 @@ var maxFightDistance = 200;
 var fightDistance = Phaser.Math.Between(minFightDistance, maxFightDistance);
 var enemyProjectileVel = 400;
 var enemyAttackSpeed = 1500;
+var enemyJumpVel = 500;
 
 var fireballs;
+var projectiles
 
 //Controls
 var keys;
