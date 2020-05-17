@@ -12,11 +12,11 @@ class SceneTitle extends Phaser.Scene {
     create() {
         keys = this.input.keyboard.createCursorKeys();
 
-        if(playerHp > enemyHp){
+        if(playerAp > enemyAp){
             this.add.image(game.config.width/2, game.config.height/2, 'bg-win');
 
         }  
-        else if (playerHp < enemyHp){
+        else if (playerAp < enemyAp){
             this.add.image(game.config.width/2, game.config.height/2, 'bg-loose');
         }
     }

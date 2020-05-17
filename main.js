@@ -90,9 +90,10 @@ class EnemyState {
 window.onload=function(){
     var config = {
             type: Phaser.AUTO,
-            width: 812,
-            height: 375,
-            backgroundColor: 0xffffff,
+            width: 374,
+            height: 352,
+            parent: 'phaser',
+            backgroundColor: 0x000000,
             pixelArt: true, //fix blurred pixels
             zoom: 1.5,
             physics: {
@@ -109,50 +110,41 @@ window.onload=function(){
 }
 
 //Lower HP if hit
-function enemyHit (player)
-{
-    if (Date.now() > lastHitTimeEnemy + 200 == true) 
-    {
-        playerHp--;  
-        player.tint = 0xff0000;
+function enemyHit (player){
+     
+    // playerAp--;  
+    player.tint = 0xff0000;
 
-        setInterval(
-            function(){ player.tint = 0xffffff; },
-            400
-        );
-
-        lastHitTimeEnemy = Date.now()
-    }
-
+    setInterval(
+        function(){ player.tint = 0xffffff; },
+        400
+    );
+    
     //End game
-    if( enemyHp < 1 || playerHp < 1)
+    if( enemyAp < 1 || playerAp < 1)
     {
         game.scene.start('SceneTitle');
     }
 }
 
-function playerHit (enemy)
-{
-    if (Date.now() > lastHitTimePlayer + 1000/15 == true) 
-    {
-        //Decrese enemy hp
-        enemyHp--;  
-        enemyDamageReceived++;
-        lastHitTimePlayer = Date.now()
+function playerHit (enemy){
+    
+    //Decrese enemy hp
+    enemyAp--;
 
-        enemy.tint = 0x00ff00;
+    enemy.tint = 0x00ff00;
 
-        setInterval(
-            function(){ enemy.tint = 0xffffff; },
-            250
-        );
-    }
+    setInterval(
+        function(){ enemy.tint = 0xffffff; },
+        250
+    );
+
 
     //End game
-    if( enemyHp < 1 || playerHp < 1)
-    {
-        game.scene.start('SceneTitle');
-    }
+    // if( enemyAp < 1 || playerAp < 1)
+    // {
+    //     game.scene.start('SceneTitle');
+    // }
 }
 
 //Knockback player when blocked
@@ -167,8 +159,7 @@ function playerKnockback(){
 
 //Player
 var player;
-var playerHp;
-var lastHitTimePlayer = Date.now();
+var playerAp;
 var playerW;
 var weaponRange = 24;
 var rectW;
@@ -184,58 +175,120 @@ var jumpTime = 30;
 var floatVelX = 200;
 var floatVelY = 400;
 
-var moveVel = 180;
-var enMoveVel = 100;
-var dashVel = 1000;
-var dashTime = 20;
-
 var playerTouchedDown = true;
+var turnAction;
+var cell = 48;
 
 
 //Enemy
 var enemy;
-var enemyHp;
-var lastHitTimeEnemy = Date.now();
+var mummy;
+var enemyAp;
 var enemyW;
-var enemyText
-var fireball;
-var enemyDamageReceived;
-var currentDamageReceived
 
-var minFightDistance = 80;
-var maxFightDistance = 200;
-var fightDistance = Phaser.Math.Between(minFightDistance, maxFightDistance);
-var enemyProjectileVel = 400;
-var enemyAttackSpeed = 1500;
-var enemyJumpVel = 500;
+//Misc
+var base;
+var baseX = 268-12;
 
-var fireballs;
-var projectiles
-
-//Controls
-var keys;
-var key1; //x
-var key2; //z
-
-//Environment
 var platforms;
-
-//Reference variables
-var rNum;
 var distance;
-var speed;
+var keys;
+var smValue;
 
-var playerText;
-
+//State mahine
 var stateMachine;
 var enemyStateMachine;
 var state;
 
+//All actions
+var actionsArray = [
+    {
+        label: 'Move left',
+        var: 'moveLeft'
+    },
+    {
+        label: 'Move right',
+        var: 'moveRight'
+    },
+    {
+        label: 'Attack',
+        var: 'attack'
+    },
+    {
+        label: 'Block',
+        var: 'block'
+    },
+    {
+        label: 'Bow',
+        var: 'bow'
+    },
+];
 
+//Drop pool
+var dropArray = [
+    {
+        label: 'Block',
+        var: 'block'
+    },
+    {
+        label: 'Bow',
+        var: 'bow'
+    },
+];
 
+//Current actions
+var playerActionsArray = [
+    {
+        label: "Move left",
+        var: 'moveLeft'
+    },
+    {
+        label: "Move right",
+        var: 'moveRight'
+    },
+    {
+        label: "Attack",
+        var: 'attack'
+    },
+];
 
+//Update actions
+function generateActions (){
+    var buttonContainer = document.querySelector('.button-container');
+    var button = document.querySelector('button');
+    
 
+    //clear action bar
+    if( button instanceof Element == true){
+        var container = buttonContainer.childElementCount
+        for (i=0; i < container; i++){
+            var element = document.querySelector('button');
+            element.parentNode.removeChild(element);
+            // console.log('removed');
+        }
+    }
 
+    
 
+    if( playerAp - playerActionsArray.length < 0){
+        smValue = playerAp;
+    }
+    else{
+        smValue = playerActionsArray.length;
+    }
 
+    //generate actions
+    for (i=0; i< smValue; i++){
+        var btn = document.createElement("button");
+        btn.setAttribute('onclick','turnAction = ' + '"' + playerActionsArray[i].var + '"');
+        btn.innerHTML = playerActionsArray[i].label;
+        buttonContainer.appendChild(btn);
+    } 
+}
 
+//Loot
+function getAction(){
+    //get random action
+            playerActionsArray.push(dropArray[Math.floor(Math.random() * dropArray.length)]);
+            generateActions();
+}
