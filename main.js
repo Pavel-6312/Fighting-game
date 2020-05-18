@@ -90,10 +90,10 @@ class EnemyState {
 window.onload=function(){
     var config = {
             type: Phaser.AUTO,
-            width: 374,
-            height: 352,
+            width: 460,
+            height: 360,
             parent: 'phaser',
-            backgroundColor: 0x000000,
+            backgroundColor: 0x151826,
             pixelArt: true, //fix blurred pixels
             zoom: 1.5,
             physics: {
@@ -103,8 +103,8 @@ window.onload=function(){
                     // debug: true
                 }
             },
-            scene: [SceneMain, SceneTitle,]
-            // scene: [SceneTitle, SceneMain, ]
+            scene: [firstScene, SceneTitle,]
+            // scene: [SceneTitle, firstScene, ]
         };
     game = new Phaser.Game(config);
 }
@@ -129,22 +129,13 @@ function enemyHit (player){
 
 function playerHit (enemy){
     
-    //Decrese enemy hp
     enemyAp--;
-
     enemy.tint = 0x00ff00;
 
     setInterval(
         function(){ enemy.tint = 0xffffff; },
         250
     );
-
-
-    //End game
-    // if( enemyAp < 1 || playerAp < 1)
-    // {
-    //     game.scene.start('SceneTitle');
-    // }
 }
 
 //Knockback player when blocked
@@ -176,15 +167,19 @@ var floatVelX = 200;
 var floatVelY = 400;
 
 var playerTouchedDown = true;
-var turnAction;
 var cell = 48;
 
+var turnAction;
+var enemyTurn = false;
 
 //Enemy
 var enemy;
 var mummy;
+var mummy2;
 var enemyAp;
 var enemyW;
+var enemyState;
+
 
 //Misc
 var base;
@@ -250,6 +245,10 @@ var playerActionsArray = [
         label: "Attack",
         var: 'attack'
     },
+    {
+        label: "Block",
+        var: 'block'
+    },
 ];
 
 //Update actions
@@ -292,3 +291,113 @@ function getAction(){
             playerActionsArray.push(dropArray[Math.floor(Math.random() * dropArray.length)]);
             generateActions();
 }
+
+var enemyArray =[
+    {
+        id: 'mummy',
+        animKey: 'mummy',
+        ap: 2,
+        state: 'idle',
+        stateTimer: 0,
+    },
+    {
+        id: 'mummy2',
+        animKey: 'mummy',
+        ap: 2,
+        state: 'idle',
+        stateTimer: 0,
+    },
+];
+
+//Calculate cell distance
+function distance(from, to){
+    var distance;
+    if(from.x < to.x){
+        distance = (to.x - from.x) / cell;
+    }
+    else{
+        distance = (to.x - from.x) / cell;
+    }
+    return distance;
+}
+
+function baseAi(scene, id , animKey, arrayKey){
+        var distanceM = distance(player, id);
+
+        //death
+        if (enemyArray[arrayKey].ap <= 0 && id.body !== undefined){
+            id.anims.play(animKey + '-death', false);
+
+            scene.time.delayedCall(500, () => {
+                getAction(); //drop
+                id.destroy();
+            }); 
+        }
+
+        enemyArray[arrayKey].stateTimer--;
+
+        if (enemyArray[arrayKey].stateTimer === 0){
+            enemyArray[arrayKey].state = 'idle';
+            enemyArray[arrayKey].stateTimer = 0;
+            id.tint = 0xffffff;
+        }
+
+        else if(distanceM < 4 && id.body !== undefined && enemyArray[arrayKey].state !== 'stun'){
+            
+            //move left
+            if (distanceM > 1){
+                id.anims.play(animKey + '-walk', true).setFlipX(false); 
+                scene.tweens.add({
+                    targets: id,
+                    x: id.x - cell,
+                    ease: 'Power1',
+                    duration: 500,
+                });
+            }
+
+            //move right
+            else if (distanceM < -1){
+                id.anims.play(animKey + '-walk', true).setFlipX(true);
+                scene.tweens.add({
+                    targets: id,
+                    x: id.x + cell,
+                    ease: 'Power1',
+                    duration: 500,
+                });
+            }  
+
+            //attack left
+            else if (distanceM < 2 && distanceM >= 0){
+                id.anims.play(animKey + '-attack', true).setFlipX(false);
+
+                if(turnAction != 'block'){
+                    playerAp--;
+                }
+                else {
+                    console.log('blocked');
+                    enemyArray[arrayKey].stateTimer = 1;
+                    enemyArray[arrayKey].state = 'stun';
+                    id.tint = 0xffff00;
+                }
+            }
+            
+            //attack right
+            else if (distanceM > -2 && distanceM <= 0){
+                id.anims.play(animKey + '-attack', true).setFlipX(true); 
+
+                if(turnAction != 'block'){
+                    playerAp--;
+                }
+                else {
+                    console.log('blocked');
+                    enemyArray[arrayKey].stateTimer = 1;
+                    enemyArray[arrayKey].state = 'stun';
+                    id.tint = 0xffff00;
+                }
+            }      
+        }
+
+        //find a way to play it without a delay
+        // id.anims.play(animKey + '-idle', true);
+    }
+

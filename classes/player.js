@@ -20,7 +20,7 @@ class PlayerPreload extends Phaser.GameObjects.Container
 //create
 class PlayerCreate extends Phaser.GameObjects.Container
 {
-    constructor(config)
+    constructor(config, x)
     {
         super(config.scene);
 
@@ -33,15 +33,12 @@ class PlayerCreate extends Phaser.GameObjects.Container
         this.enemy = config.scene.enemy;
 
         //Add player
-        player = this.physics.add.sprite(game.config.width*0.25, 0, 'p1-idle');
+        player = this.physics.add.sprite(x, 0 , 'p1-idle');
 
         //Properties
-        player.direction = 'right';
-        // player.setCollideWorldBounds(true);
-        player.body.setSize(16, 36, 1, 1);// X, Y, XYOffset
+        // player.body.setSize(16, 36, 1, 1);// X, Y, XYOffset
 
-        playerAp= 3;
-        generateActions();
+        playerAp= 5;
         
         //Rec
         rectW = this.scene.add.graphics();
@@ -49,7 +46,6 @@ class PlayerCreate extends Phaser.GameObjects.Container
         
         //Collider
         this.physics.add.collider(player, platforms);
-        
         this.physics.add.collider(rectW, platforms);
 
         //Idle anim
@@ -118,10 +114,8 @@ class IdleState extends State{
   
     enter(scene){
         player.setVelocity(0);
-        player.anims.play('p1-idle', true); 
-
-        //End turn here
-        turnAction ='end';            
+        player.anims.play('p1-idle', true);  
+        generateActions();       
     }
 
     execute(scene){
@@ -169,7 +163,6 @@ class MoveState extends State {
             scene.tweens.add({
                 targets: player,
                 x: player.x - cell,
-                y: player.y,
                 ease: 'Power1',
                 duration: 500,
             });
@@ -182,41 +175,16 @@ class MoveState extends State {
             scene.tweens.add({
                 targets: player,
                 x: player.x + cell,
-                y: player.y,
                 ease: 'Power1',
                 duration: 500,
             });
         }
 
         //end turn
-            scene.time.delayedCall(500, () => {  
-                this.stateMachine.transition('idle');
-                return;
-            }); 
-    }
-}
-
-//jump
-class JumpState extends State {
-    enter(scene) {
-    
-        if (keys.up.isDown && player.body.touching.down){
-            player.setVelocityY(-jumpVel);
-            player.anims.play('p1-jump', true); 
-            player.direction = 'up'; 
-
-            scene.time.delayedCall(jumpTime, () => {  
-                player.setVelocityY(-floatVelY);
-            });   
-        }  
-    }
-
-    execute(scene){
-
-        if (keys.up.isUp){
-            this.stateMachine.transition('idle'); 
-        } 
-
+        scene.time.delayedCall(500, () => {  
+            this.stateMachine.transition('endturn');
+            return;
+        }); 
     }
 }
 
@@ -224,73 +192,21 @@ class JumpState extends State {
 class AttackState extends State{
     enter(scene) {
 
-        //If jumping reduce vel after timer
-        scene.time.delayedCall(attStartupTime, () => {
-            player.setVelocity(0);
-        });
-
         player.anims.play('p1-attack', true);
 
-        scene.physics.add.existing(rectW);
-        rectW.body.setAllowGravity(false);
-        
-        rectW.body.width = weaponRange;
-        rectW.body.height = 16;
+        for(var i = 0; i < enemyArray.length; i++){
+            var distanceEnemy = distance(player, window[enemyArray[i].id]);
 
-        
-        scene.time.delayedCall(attStartupTime, () => {
-            if (player.flipX == false){
-                rectW.x = player.x + player.body.width/2;  
-            } 
-            else {
-                rectW.x = player.x - player.body.width*2;
+            if(distanceEnemy < 1 && distanceEnemy > -1){
+                enemyArray[i].ap--;
             }
-            rectW.y = player.y - rectW.body.height/2;  
-        });
-
+        }
+        
         //end turn
         scene.time.delayedCall(500, () => { 
-            this.stateMachine.transition('idle');  
+            this.stateMachine.transition('endturn');  
             return;    
         });
-    }
-}
-
-//block
-class BlockState extends State{
-    enter(scene) {
-
-        player.anims.play('p1-block', true);
-
-        scene.physics.add.existing(rectW2);
-        rectW2.body.setAllowGravity(false);
-        rectW2.body.immovable = true;
-        
-        rectW2.body.width = 8;
-        rectW2.body.height = 36;
-        
-         
-        scene.time.delayedCall(blockStartupTime, () => {
-            //Right
-            if (player.flipX == false){
-                rectW2.x = player.x + player.body.width/2;
-                    
-            } 
-            //Left
-            else {
-                rectW2.x = player.x - player.body.width/2 - rectW2.body.width;
-            }
-            rectW2.y = player.y - rectW2.body.height/2; 
-        });
-
-        scene.time.delayedCall(blockTime, () => {
-                
-            rectW2.y=game.config.height-5;
-            
-            this.stateMachine.transition('idle');
-            return;      
-        });
-               
     }
 }
 
@@ -303,5 +219,31 @@ class DeathState extends State{
         scene.time.delayedCall(2000, () => {
             game.scene.start('SceneTitle');
         } );    
+    }
+}
+
+//end turn
+class EndTurnState extends State{
+    enter(scene) {
+        baseAi(scene, window[enemyArray[0].id], enemyArray[0].animKey, 0);
+        baseAi(scene, window[enemyArray[1].id], enemyArray[1].animKey, 1);
+
+        turnAction ='end';   
+        // enemyTurn = true; 
+        this.stateMachine.transition('idle');
+    }
+}
+
+//block
+class BlockState extends State{
+    enter(scene) {
+        player.anims.play('p1-block', true);
+        turnAction ='block';   
+        
+        //end turn
+            scene.time.delayedCall(500, () => { 
+                this.stateMachine.transition('endturn');  
+                return;    
+            });
     }
 }

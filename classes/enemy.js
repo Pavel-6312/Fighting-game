@@ -66,45 +66,106 @@ class EnemyCreate extends Phaser.GameObjects.Container
     }
 };
 
-//create mummy
-class MummyCreate extends Phaser.GameObjects.Container{
-    constructor(config, x, id)
+//Basic enemy
+class BasicEnemyAnimsCreate extends Phaser.GameObjects.Container{
+    constructor(config, id, animKey)
     {
         super(config.scene);        
         this.anims = config.scene.anims;
 
-//walk
+        //idle
         this.anims.create({
-            key: 'mummy-walk',
-            frames: this.anims.generateFrameNumbers('mummy-walk', { start: 0, end: 6 }),
+            key: animKey + '-idle',
+            frames: this.anims.generateFrameNumbers(animKey + '-idle', { start: 0, end: 4 }),
             frameRate: 6,
             repeat: -1 // -1 run forever / 1 -> run once
         });
 
-//idle
+        //walk
         this.anims.create({
-            key: 'mummy-idle',
-            frames: this.anims.generateFrameNumbers('mummy-idle', { start: 0, end: 4 }),
-            frameRate: 6,
-            repeat: -1 // -1 run forever / 1 -> run once
+            key: animKey + '-walk',
+            frames: this.anims.generateFrameNumbers(animKey + '-walk', { start: 0, end: 6 }),
+            frameRate: 10,
+            repeat: 0
         });
 
-        mummy.anims.play('mummy-idle', false);
-
-//attack
+        //attack
         this.anims.create({
-            key: 'mummy-attack',
-            frames: this.anims.generateFrameNumbers('mummy-attack', { start: 0, end: 0 }),
-            frameRate: 1,
+            key: animKey + '-attack',
+            frames: this.anims.generateFrameNumbers(animKey + '-attack', { start: 0, end: 6 }),
+            frameRate: 10,
+            repeat:0
         });       
 
-//death
+        //death
         this.anims.create({
-            key: 'mummy-death',
-            frames: this.anims.generateFrameNumbers('mummy-attack', { start: 0, end: 0 }),
-            frameRate: 1,
-            repeat:1,
+            key: animKey + '-death',
+            frames: this.anims.generateFrameNumbers(animKey + '-death', { start: 0, end: 10 }),
+            frameRate: 10,
+            repeat:0,
         });   
+    }
+}
+
+class BasicEnemyUpdate extends Phaser.GameObjects.Container
+{
+    constructor(config, id , animKey)
+    {
+        super(config.scene);
+        var distanceM = distance(player, id);
+
+        if(turnAction != 'end' && enemyTurn == true && distanceM < 4){
+            // enemyTurn = false;
+            
+
+            config.scene.time.delayedCall(500, () => {  
+                id.anims.play(animKey + '-idle', true);
+            }); 
+
+            //move left
+            if (distanceM > 1){
+                id.anims.play(animKey + '-walk', true).setFlipX(false); 
+                config.scene.tweens.add({
+                    targets: id,
+                    x: id.x - cell,
+                    ease: 'Power1',
+                    duration: 500,
+                });
+                // console.log('move l');
+            }
+
+            //move right
+            else if (distanceM < -1){
+                id.anims.play(animKey + '-walk', true).setFlipX(true);
+                config.scene.tweens.add({
+                    targets: id,
+                    x: id.x + cell,
+                    ease: 'Power1',
+                    duration: 500,
+                });
+                // console.log('move r');
+            }  
+
+            //attack left
+            else if (distanceM < 2 && distanceM >= 0){
+                id.anims.play(animKey + '-attack', true).setFlipX(false);
+                // console.log('att l'); 
+            }
+
+            //attack right
+            else if (distanceM > -2 && distanceM <= 0){
+                id.anims.play(animKey + '-attack', true).setFlipX(true); 
+                // console.log('att r');
+            }      
+            // else if (idAp <= 0){
+            //     enemy.anims.play('e-death', false);
+
+            //     scene.time.delayedCall(500, () => {
+            //         getAction();
+            //         enemy.destroy();
+            //     }); 
+            // }
+        }
     }
 }
 
@@ -115,62 +176,6 @@ class EnemyUpdate extends Phaser.GameObjects.Container
     {
         super(config.scene);
         enemyStateMachine.step();
-
-        if(turnAction == 'end'){
-            if (player.x - mummy.x <= -cell){
-                mummy.anims.play('mummy-walk', true).setFlipX(false); 
-
-                config.scene.tweens.add({
-                    targets: mummy,
-                    x: mummy.x - cell,
-                    ease: 'Power1',
-                    duration: 500,
-                });
-
-                config.scene.time.delayedCall(500, () => {  
-                    mummy.anims.play('mummy-idle', true);
-                   
-                }); 
-
-            }
-
-            else if (player.x - mummy.x >= cell){
-                
-                mummy.anims.play('mummy-walk', true).setFlipX(true);
-
-                config.scene.tweens.add({
-                    targets: mummy,
-                    x: mummy.x + cell,
-                    ease: 'Power1',
-                    duration: 500,
-                });
-
-                config.scene.time.delayedCall(500, () => {  
-                    mummy.anims.play('mummy-idle', true);
-        
-                }); 
-            }  
-            else if (player.x - mummy.x > -cell){
-                mummy.anims.play('mummy-attack', true).setFlipX(false); 
-
-                config.scene.time.delayedCall(500, () => {  
-                    mummy.anims.play('mummy-idle', true);
-                    
-                }); 
-
-            }
-
-            else if (player.x - mummy.x < cell){
-                
-                mummy.anims.play('mummy-attack', true).setFlipX(true);
-
-                config.scene.time.delayedCall(500, () => {  
-                    mummy.anims.play('mummy-idle', true);
-                    
-                }); 
-            }  
-        } 
-
     }
 }
 
