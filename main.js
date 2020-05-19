@@ -176,6 +176,8 @@ var enemyTurn = false;
 var enemy;
 var mummy;
 var mummy2;
+var dog;
+
 var enemyAp;
 var enemyW;
 var enemyState;
@@ -299,13 +301,23 @@ var enemyArray =[
         ap: 2,
         state: 'idle',
         stateTimer: 0,
+        spawn: 5,
     },
     {
         id: 'mummy2',
-        animKey: 'mummy',
+        animKey: 'deceased',
         ap: 2,
         state: 'idle',
         stateTimer: 0,
+        spawn: 6,
+    },
+    {
+        id: 'dog',
+        animKey: 'dog',
+        ap: 2,
+        state: 'idle',
+        stateTimer: 0,
+        spawn: 4,
     },
 ];
 

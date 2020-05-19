@@ -5,15 +5,26 @@ class EnemyPreload extends Phaser.GameObjects.Container
     {
         super(config.scene);
         this.load = config.scene.load;
-        
+//Boss       
         this.load.spritesheet('e-idle', 'assets/e-idle.png', {frameWidth: 96, frameHeight: 96,});
         this.load.spritesheet('e-attack', 'assets/e-attack.png', {frameWidth: 96, frameHeight: 96,});
         this.load.image('chest', 'assets/it/chest.png');
-
+//Mummy
         this.load.spritesheet('mummy-idle', 'assets/desert-enemy/5 Mummy/Mummy_idle.png',{frameWidth: 48, frameHeight: 48,});
         this.load.spritesheet('mummy-walk', 'assets/desert-enemy/5 Mummy/Mummy_walk.png',{frameWidth: 48, frameHeight: 48,});
         this.load.spritesheet('mummy-attack', 'assets/desert-enemy/5 Mummy/Mummy_attack.png',{frameWidth: 48, frameHeight: 48,});
         this.load.spritesheet('mummy-death', 'assets/desert-enemy/5 Mummy/Mummy_death.png',{frameWidth: 48, frameHeight: 48,});
+//Pharaoh
+        this.load.spritesheet('deceased-idle', 'assets/desert-enemy/6 Deceased/Deceased_idle.png',{frameWidth: 48, frameHeight: 48,});
+        this.load.spritesheet('deceased-walk', 'assets/desert-enemy/6 Deceased/Deceased_walk.png',{frameWidth: 48, frameHeight: 48,});
+        this.load.spritesheet('deceased-attack', 'assets/desert-enemy/6 Deceased/Deceased_attack.png',{frameWidth: 48, frameHeight: 48,});
+        this.load.spritesheet('deceased-death', 'assets/desert-enemy/6 Deceased/Deceased_death.png',{frameWidth: 48, frameHeight: 48,});
+        this.load.image('deceased-projectile', 'assets/desert-enemy/6 Deceased/Ball.png');      
+//Dog
+        this.load.spritesheet('dog-idle', 'assets/desert-enemy/2 Hyena/Hyena_idle.png',{frameWidth: 48, frameHeight: 48,});
+        this.load.spritesheet('dog-walk', 'assets/desert-enemy/2 Hyena/Hyena_walk.png',{frameWidth: 48, frameHeight: 48,});
+        this.load.spritesheet('dog-attack', 'assets/desert-enemy/2 Hyena/Hyena_attack.png',{frameWidth: 48, frameHeight: 48,});
+        this.load.spritesheet('dog-death', 'assets/desert-enemy/2 Hyena/Hyena_death.png',{frameWidth: 48, frameHeight: 48,});
     }
 }
 
@@ -68,7 +79,7 @@ class EnemyCreate extends Phaser.GameObjects.Container
 
 //Basic enemy
 class BasicEnemyAnimsCreate extends Phaser.GameObjects.Container{
-    constructor(config, id, animKey)
+    constructor(config, animKey)
     {
         super(config.scene);        
         this.anims = config.scene.anims;

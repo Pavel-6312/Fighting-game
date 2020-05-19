@@ -201,7 +201,7 @@ class AttackState extends State{
                 enemyArray[i].ap--;
             }
         }
-        
+
         //end turn
         scene.time.delayedCall(500, () => { 
             this.stateMachine.transition('endturn');  
@@ -225,8 +225,11 @@ class DeathState extends State{
 //end turn
 class EndTurnState extends State{
     enter(scene) {
-        baseAi(scene, window[enemyArray[0].id], enemyArray[0].animKey, 0);
-        baseAi(scene, window[enemyArray[1].id], enemyArray[1].animKey, 1);
+
+        //run enemy logic
+        for(i=0; i < enemyArray.length; i++){
+            baseAi(scene, window[enemyArray[i].id], enemyArray[i].animKey, i);
+        }
 
         turnAction ='end';   
         // enemyTurn = true; 

@@ -12,8 +12,6 @@ class firstScene extends Phaser.Scene {
 
     create() {   
    
-
-    //Player state machine
         stateMachine = new StateMachine('idle', {
             idle: new IdleState(),
             move: new MoveState(),
@@ -23,7 +21,6 @@ class firstScene extends Phaser.Scene {
             block: new BlockState(),
         },[this, this.player]);  
 
-    //Enemy state machine
         enemyStateMachine = new EnemyStateMachine('enemyDeath', {
             enemyIdle: new EnemyIdleState(),
             enemyMove: new EnemyMoveState(),
@@ -31,22 +28,10 @@ class firstScene extends Phaser.Scene {
             enemyDeath: new EnemyDeathState(),
         },[this, this.enemy]); 
 
-    //Sprites
+    //create environment
         var bg = this.add.image(0, -56, 'bg');
         bg.setOrigin(0,0);
-
-        this.player = new PlayerCreate({scene:this}, cell/2 + cell * 3);
-        new BasicEnemyAnimsCreate({scene:this}, mummy, 'mummy');
-
-        mummy = this.physics.add.sprite(cell/2 + cell * 5, 0, 'mummy-idle');
-        mummy.anims.play('mummy-idle', false);
-
-        mummy2 = this.physics.add.sprite(cell/2 + cell * 8, 0, 'mummy-idle');
-        mummy2.anims.play('mummy-idle', false);
-
-        this.enemy = new EnemyCreate({scene:this}, game.config.width);    
-
-    //Floor
+    
         base = this.add.graphics();
         this.physics.add.existing(base);
         base.body.setAllowGravity(false);
@@ -56,12 +41,27 @@ class firstScene extends Phaser.Scene {
         base.x = 0;
         base.y = baseX;
 
-    //Colliders
+    //create player
+        this.player = new PlayerCreate({scene:this}, cell/2 + cell * 2);
+
+    //create enemies
+        for(var i=0; i < enemyArray.length; i++){
+            //create sprite
+            window[enemyArray[i].id] = this.physics.add.sprite(cell/2 + cell * enemyArray[i].spawn, 0, enemyArray[i].animKey + '-idle');
+            //load all anims
+            new BasicEnemyAnimsCreate({scene:this}, enemyArray[i].animKey);
+            //run idle
+            window[enemyArray[i].id].anims.play(enemyArray[i].animKey + '-idle', false);
+            //collider
+            this.physics.add.collider(window[enemyArray[i].id], base);
+        }
+
+    //create boss
+        this.enemy = new EnemyCreate({scene:this}, game.config.width);    
+
+    //colliders
         this.physics.add.collider(player, base);
         this.physics.add.collider(enemy, base);
-        this.physics.add.collider(mummy, base);
-        this.physics.add.collider(mummy2, base);
-        this.physics.add.overlap(enemy, rectW, playerHit.bind(this));
 
     //camera
         this.cameras.main.startFollow(player);
