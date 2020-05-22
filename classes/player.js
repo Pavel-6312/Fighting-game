@@ -12,8 +12,9 @@ class PlayerPreload extends Phaser.GameObjects.Container
         this.load.spritesheet('p1-idle', 'assets/p-idle.png', {frameWidth: 48, frameHeight: 48,})
         this.load.spritesheet('p1-attack', 'assets/p-attack.png', {frameWidth: 48, frameHeight: 48,})
         this.load.spritesheet('p1-block', 'assets/p-block.png', {frameWidth: 48, frameHeight: 48,})
+        this.load.spritesheet('p1-bow', 'assets/p-bow.png', {frameWidth: 48, frameHeight: 48,})
 
-        this.load.spritesheet('death', 'assets/desert-enemy/5 Mummy/Mummy_death.png', {frameWidth: 48, frameHeight: 48,})
+        this.load.spritesheet('p1-death', 'assets/desert-enemy/5 Mummy/Mummy_death.png', {frameWidth: 48, frameHeight: 48,})
     }
 }
 
@@ -24,71 +25,58 @@ class PlayerCreate extends Phaser.GameObjects.Container
     {
         super(config.scene);
 
-        //Varables for class
-        this.scene = config.scene;
-        this.physics = config.scene.physics;
-        this.anims = config.scene.anims;
-        this.platforms = config.scene.platforms;
-        this.player = config.scene.player;
-        this.enemy = config.scene.enemy;
-
-        //Add player
-        player = this.physics.add.sprite(x, 0 , 'p1-idle');
-
-        //Properties
-        // player.body.setSize(16, 36, 1, 1);// X, Y, XYOffset
-
-        playerAp= 5;
-        
-        //Rec
-        rectW = this.scene.add.graphics();
-        rectW2 = this.scene.add.graphics();
-        
-        //Collider
-        this.physics.add.collider(player, platforms);
-        this.physics.add.collider(rectW, platforms);
+        player = config.scene.physics.add.sprite(x, 0 , 'p1-idle');
+        playerAp= 10;
 
         //Idle anim
-        this.anims.create({
+        config.scene.anims.create({
             key: 'p1-idle',
-            frames: this.anims.generateFrameNumbers('p1-idle', { start: 0, end: 4 }),
+            frames: config.scene.anims.generateFrameNumbers('p1-idle', { start: 0, end: 4 }),
             frameRate: 6,
             repeat: -1
         });
 
         //Attack anim
-        this.anims.create({
+        config.scene.anims.create({
             key: 'p1-attack',
-            frames: this.anims.generateFrameNumbers('p1-attack', { start: 0, end: 6 }),
+            frames: config.scene.anims.generateFrameNumbers('p1-attack', { start: 0, end: 6 }),
             frameRate: 10,
             repeat:0
         });
 
         //Walk anim
-        this.anims.create({
+        config.scene.anims.create({
             key: 'p1-move',
-            frames: this.anims.generateFrameNumbers('p1-move', { start: 0, end: 6 }),
+            frames: config.scene.anims.generateFrameNumbers('p1-move', { start: 0, end: 6 }),
             frameRate: 10,
         });
 
         //Jump anim
-        this.anims.create({
+        config.scene.anims.create({
             key: 'p1-jump',
-            frames: this.anims.generateFrameNumbers('p1-jump', { start: 0, end: 6 }),
+            frames: config.scene.anims.generateFrameNumbers('p1-jump', { start: 0, end: 6 }),
             frameRate: 6,
         });
 
         //Block anim
-        this.anims.create({
+        config.scene.anims.create({
             key: 'p1-block',
-            frames: this.anims.generateFrameNumbers('p1-block', { start: 0, end: 0 }),
-            frameRate: 1,
+            frames: config.scene.anims.generateFrameNumbers('p1-block', { start: 0, end: 0 }),
+            frameRate: 10,
         });
 
         //Death anim
-        this.anims.create({
-            key: 'death',
-            frames: this.anims.generateFrameNumbers('death', { start: 0, end: 6 }),
+        config.scene.anims.create({
+            key: 'p1-death',
+            frames: config.scene.anims.generateFrameNumbers('p1-death', { start: 0, end: 6 }),
+            frameRate: 10,
+            repeat:0
+        });
+
+        //Bow anim
+        config.scene.anims.create({
+            key: 'p1-bow',
+            frames: config.scene.anims.generateFrameNumbers('p1-bow', { start: 0, end: 6 }),
             frameRate: 10,
             repeat:0
         });
@@ -101,10 +89,6 @@ class PlayerUpdate extends Phaser.GameObjects.Container
     constructor(config)
     {
         super(config.scene);
-
-        //Send weapon rect underground
-        rectW.y=game.config.height-5;
-
         stateMachine.step();
     }
 }
@@ -115,7 +99,8 @@ class IdleState extends State{
     enter(scene){
         player.setVelocity(0);
         player.anims.play('p1-idle', true);  
-        generateActions();       
+        generateActions();  
+        // turnAction.action = playerActionsArray[turnAction.id].var     
     }
 
     execute(scene){
@@ -126,26 +111,26 @@ class IdleState extends State{
         }
 
         //to move
-        if (turnAction == 'moveLeft' || turnAction == 'moveRight'){
+        if (turnAction.action == 'moveLeft' || turnAction.action == 'moveRight'){
             this.stateMachine.transition('move');
             return;
         }
 
-        //to jump
-        if (turnAction == ''){
-            this.stateMachine.transition('jump');
-            return;
-        }
-
         //to attack
-        if (turnAction == 'attack'){
+        if (turnAction.action == 'attack'){
             this.stateMachine.transition('attack');
             return;
         }
 
         //to block
-        if (turnAction == 'block'){
+        if (turnAction.action == 'block'){
             this.stateMachine.transition('block');
+            return;
+        }
+
+        //to block
+        if (turnAction.action == 'bow'){
+            this.stateMachine.transition('bow');
             return;
         }
     }
@@ -155,9 +140,9 @@ class IdleState extends State{
 class MoveState extends State {
     enter(scene) {
 
-        if (turnAction == 'moveLeft'){
+        if (turnAction.action == 'moveLeft'){
             player.anims.play('p1-move', true).setFlipX(true);
-            turnAction ='end'; 
+            turnAction.action ='end'; 
 
             //twin
             scene.tweens.add({
@@ -168,7 +153,7 @@ class MoveState extends State {
             });
             
               
-        }  else if (turnAction == 'moveRight'){
+        }  else if (turnAction.action == 'moveRight'){
             player.anims.play('p1-move', true).setFlipX(false);
             
             //twin
@@ -191,7 +176,7 @@ class MoveState extends State {
 //attack
 class AttackState extends State{
     enter(scene) {
-
+        playerActionsArray[turnAction.id].durability--
         player.anims.play('p1-attack', true);
 
         for(var i = 0; i < enemyArray.length; i++){
@@ -214,11 +199,58 @@ class AttackState extends State{
 class DeathState extends State{
     enter(scene) {
 
-        player.anims.play('death', false);
+        player.anims.play('p1-death', false);
 
         scene.time.delayedCall(2000, () => {
             game.scene.start('SceneTitle');
         } );    
+    }
+}
+
+//block
+class BlockState extends State{
+    enter(scene) {
+        if(playerActionsArray[turnAction.id].durability>=0){
+            playerActionsArray[turnAction.id].durability--
+            player.anims.play('p1-block', true);
+            turnAction.action ='block';   
+        
+            //end turn
+            scene.time.delayedCall(500, () => { 
+                this.stateMachine.transition('endturn');  
+                return;    
+            });
+        }
+    }
+}
+
+//bow
+class BowState extends State{
+    enter(scene) {
+        if(playerActionsArray[turnAction.id].durability >= 0 && enemyArray[0] !== undefined){
+            playerActionsArray[turnAction.id].durability--
+            player.anims.play('p1-bow', true);
+
+            var closestArr =[];
+
+            //Push distances to arr
+            for(var i = 0; i < enemyArray.length; i++){
+                enemyArray[i].distance = distance(player, window[enemyArray[i].id]);
+                closestArr.push(distance(player, window[enemyArray[i].id]));
+            } 
+
+            //Get index of obj with smallest distance
+            const target = enemyArray.findIndex(x => x.distance === Math.min(...closestArr));
+
+            // Deal damage
+            enemyArray[target].ap--;
+            
+            //end turn
+            scene.time.delayedCall(500, () => { 
+                this.stateMachine.transition('endturn');  
+                return;    
+            });
+        }
     }
 }
 
@@ -230,23 +262,8 @@ class EndTurnState extends State{
         for(i=0; i < enemyArray.length; i++){
             baseAi(scene, window[enemyArray[i].id], enemyArray[i].animKey, i);
         }
-
-        turnAction ='end';   
-        // enemyTurn = true; 
+        turnAction.id =null; 
+        turnAction.action =null;   
         this.stateMachine.transition('idle');
-    }
-}
-
-//block
-class BlockState extends State{
-    enter(scene) {
-        player.anims.play('p1-block', true);
-        turnAction ='block';   
-        
-        //end turn
-            scene.time.delayedCall(500, () => { 
-                this.stateMachine.transition('endturn');  
-                return;    
-            });
     }
 }

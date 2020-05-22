@@ -95,7 +95,7 @@ window.onload=function(){
             parent: 'phaser',
             backgroundColor: 0x151826,
             pixelArt: true, //fix blurred pixels
-            zoom: 1.5,
+            zoom: 1,
             physics: {
                 default: "arcade",
                 arcade: {
@@ -127,172 +127,147 @@ function enemyHit (player){
     }
 }
 
-function playerHit (enemy){
-    
-    enemyAp--;
-    enemy.tint = 0x00ff00;
-
-    setInterval(
-        function(){ enemy.tint = 0xffffff; },
-        250
-    );
-}
-
-//Knockback player when blocked
-function playerKnockback(){
-    if(player.flipX ==false){
-        player.setVelocityX(-blockTime);
-    }
-    else {
-        player.setVelocityX(blockTime);
-    }
-}
-
 //Player
-var player;
-var playerAp;
-var playerW;
-var weaponRange = 24;
-var rectW;
-var rectW2;
-
-var attTime = 500;
-var attStartupTime = 200;
-var blockTime = 300;
-var blockStartupTime = 0;
-
-var jumpVel = 2000;
-var jumpTime = 30;
-var floatVelX = 200;
-var floatVelY = 400;
-
-var playerTouchedDown = true;
-var cell = 48;
-
-var turnAction;
-var enemyTurn = false;
+var player, playerAp
+var stateMachine, state
 
 //Enemy
-var enemy;
-var mummy;
-var mummy2;
-var dog;
-
-var enemyAp;
-var enemyW;
-var enemyState;
-
+var enemy, mummy, mummy2, dog
+var enemyAp, enemyState, enemyStateMachine
+var enemyTurn = false
 
 //Misc
-var base;
-var baseX = 268-12;
+var turnAction ={
+    id:null,
+    action:null
+}
+var base, distance, keys, availableActions
+var baseX = 268-12
+var cell = 48
 
-var platforms;
-var distance;
-var keys;
-var smValue;
 
-//State mahine
-var stateMachine;
-var enemyStateMachine;
-var state;
 
 //All actions
 var actionsArray = [
     {
-        label: 'Move left',
-        var: 'moveLeft'
+        label: '&#8592 Move',
+        var: 'moveLeft',
     },
     {
-        label: 'Move right',
-        var: 'moveRight'
+        label: 'Move &#8594;',
+        var: 'moveRight',
     },
     {
         label: 'Attack',
-        var: 'attack'
+        var: 'attack',
+        durability: 6,
     },
     {
         label: 'Block',
-        var: 'block'
+        var: 'block',
+        durability: 4,
     },
     {
         label: 'Bow',
-        var: 'bow'
+        var: 'bow',
+        durability: 2,
     },
-];
-
-//Drop pool
-var dropArray = [
-    {
-        label: 'Block',
-        var: 'block'
-    },
-    {
-        label: 'Bow',
-        var: 'bow'
-    },
-];
+]
 
 //Current actions
 var playerActionsArray = [
     {
-        label: "Move left",
-        var: 'moveLeft'
+        label: '&#8592 Move',
+        var: 'moveLeft',
+        type:'basic'
     },
     {
-        label: "Move right",
-        var: 'moveRight'
+        label: 'Move &#8594;',
+        var: 'moveRight',
+        type:'basic'
     },
     {
-        label: "Attack",
-        var: 'attack'
+        label: 'Attack',
+        var: 'attack',
+        durability: 6,
     },
     {
-        label: "Block",
-        var: 'block'
+        label: 'Block',
+        var: 'block',
+        durability: 4,
     },
-];
+    {
+        label: 'Bow',
+        var: 'bow',
+        durability: 2,
+    },
+]
 
-//Update actions
+//Generate actions
 function generateActions (){
-    var buttonContainer = document.querySelector('.button-container');
-    var button = document.querySelector('button');
-    
+    var buttonContainer = document.querySelector('.button-container'); //html button div
+    var button = document.querySelector('button'); //html button object
 
     //clear action bar
-    if( button instanceof Element == true){
+    if(button instanceof Element == true){ //check if buttons are in DOM
         var container = buttonContainer.childElementCount
-        for (i=0; i < container; i++){
-            var element = document.querySelector('button');
-            element.parentNode.removeChild(element);
-            // console.log('removed');
+        for (i=0; i < container; i++){ //loop through all buttons
+            document.querySelector('button').parentNode.removeChild(document.querySelector('button'));
+            console.log('delete');
         }
     }
 
-    
+    //clear actions with 0 duravility
+    playerActionsArray = playerActionsArray.filter(function( obj ) {
+        return obj.durability !== 0;
+    });
 
+    //check if there are more actions than ap
     if( playerAp - playerActionsArray.length < 0){
-        smValue = playerAp;
+        availableActions = playerAp;
     }
     else{
-        smValue = playerActionsArray.length;
+        availableActions = playerActionsArray.length;
     }
 
-    //generate actions
-    for (i=0; i< smValue; i++){
+    //add actions
+    for (i=0; i< availableActions; i++){
         var btn = document.createElement("button");
-        btn.setAttribute('onclick','turnAction = ' + '"' + playerActionsArray[i].var + '"');
-        btn.innerHTML = playerActionsArray[i].label;
+        btn.setAttribute('onclick', 'saveAction(' + i + ')'); //update turnAction var on click
+
+        if(actionsArray[i].durability != undefined){
+            btn.innerHTML = playerActionsArray[i].label + ' (' + playerActionsArray[i].durability +')'; //add durability
+            console.log('update durability');
+        }
+        else {
+            btn.innerHTML = playerActionsArray[i].label;
+        }
+
         buttonContainer.appendChild(btn);
     } 
 }
 
+function saveAction(i){
+    turnAction.id = i
+    turnAction.action = playerActionsArray[i].var 
+}
+
 //Loot
 function getAction(){
+    //exclude basic actions
+    dropArray = playerActionsArray.filter(function( obj ) {
+        return obj.type !== 'basic';
+    });
     //get random action
-            playerActionsArray.push(dropArray[Math.floor(Math.random() * dropArray.length)]);
-            generateActions();
+    playerActionsArray.push(dropArray[Math.floor(Math.random() * dropArray.length)]);
+    generateActions();
+    console.log('loot');
 }
+
+
+
+
+
 
 var enemyArray =[
     {
@@ -301,7 +276,8 @@ var enemyArray =[
         ap: 2,
         state: 'idle',
         stateTimer: 0,
-        spawn: 5,
+        spawn: 7,
+        distance: 0,
     },
     {
         id: 'mummy2',
@@ -309,7 +285,8 @@ var enemyArray =[
         ap: 2,
         state: 'idle',
         stateTimer: 0,
-        spawn: 6,
+        spawn: 8,
+        distance: 0,
     },
     {
         id: 'dog',
@@ -317,9 +294,10 @@ var enemyArray =[
         ap: 2,
         state: 'idle',
         stateTimer: 0,
-        spawn: 4,
+        spawn: 7,
+        distance: 0,
     },
-];
+]
 
 //Calculate cell distance
 function distance(from, to){
@@ -336,19 +314,20 @@ function distance(from, to){
 function baseAi(scene, id , animKey, arrayKey){
         var distanceM = distance(player, id);
 
+        enemyArray[arrayKey].stateTimer--;
+        
         //death
         if (enemyArray[arrayKey].ap <= 0 && id.body !== undefined){
-            id.anims.play(animKey + '-death', false);
+            id.anims.play(animKey + '-death', true);
 
             scene.time.delayedCall(500, () => {
                 getAction(); //drop
                 id.destroy();
+                enemyArray.splice(arrayKey, 1);
             }); 
         }
 
-        enemyArray[arrayKey].stateTimer--;
-
-        if (enemyArray[arrayKey].stateTimer === 0){
+        else if (enemyArray[arrayKey].stateTimer === 0){
             enemyArray[arrayKey].state = 'idle';
             enemyArray[arrayKey].stateTimer = 0;
             id.tint = 0xffffff;
@@ -383,7 +362,7 @@ function baseAi(scene, id , animKey, arrayKey){
                 id.anims.play(animKey + '-attack', true).setFlipX(false);
 
                 if(turnAction != 'block'){
-                    playerAp--;
+                    // playerAp--;
                 }
                 else {
                     console.log('blocked');
@@ -411,5 +390,5 @@ function baseAi(scene, id , animKey, arrayKey){
 
         //find a way to play it without a delay
         // id.anims.play(animKey + '-idle', true);
-    }
+}
 

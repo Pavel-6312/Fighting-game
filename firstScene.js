@@ -5,13 +5,29 @@ class firstScene extends Phaser.Scene {
     }
 
     preload() { 
-        new PlatformsPreload({scene:this}); 
+        this.load.image('bg', 'assets/bg.png')
         new PlayerPreload({scene:this}); 
         new EnemyPreload({scene:this}); 
     }
 
     create() {   
    
+
+    //create environment
+        var bg = this.add.image(0, -56, 'bg')
+        bg.setOrigin(0,0);
+
+        base = this.add.graphics()
+        this.physics.add.existing(base)
+        base.body.setAllowGravity(false)
+        base.body.immovable = true
+        base.body.width = 1000
+        base.body.height = 24
+        base.x = 0
+        base.y = baseX
+
+    //create unites
+        this.player = new PlayerCreate({scene:this}, cell/2 + cell * 4)
         stateMachine = new StateMachine('idle', {
             idle: new IdleState(),
             move: new MoveState(),
@@ -19,8 +35,10 @@ class firstScene extends Phaser.Scene {
             death: new DeathState(),
             endturn: new EndTurnState(),
             block: new BlockState(),
+            bow: new BowState(),
         },[this, this.player]);  
 
+        this.enemy = new EnemyCreate({scene:this}, cell/2 + cell * 9); 
         enemyStateMachine = new EnemyStateMachine('enemyDeath', {
             enemyIdle: new EnemyIdleState(),
             enemyMove: new EnemyMoveState(),
@@ -28,23 +46,7 @@ class firstScene extends Phaser.Scene {
             enemyDeath: new EnemyDeathState(),
         },[this, this.enemy]); 
 
-    //create environment
-        var bg = this.add.image(0, -56, 'bg');
-        bg.setOrigin(0,0);
-    
-        base = this.add.graphics();
-        this.physics.add.existing(base);
-        base.body.setAllowGravity(false);
-        base.body.immovable = true;
-        base.body.width = 1000;
-        base.body.height = 24;
-        base.x = 0;
-        base.y = baseX;
-
-    //create player
-        this.player = new PlayerCreate({scene:this}, cell/2 + cell * 2);
-
-    //create enemies
+    //create generic enemies
         for(var i=0; i < enemyArray.length; i++){
             //create sprite
             window[enemyArray[i].id] = this.physics.add.sprite(cell/2 + cell * enemyArray[i].spawn, 0, enemyArray[i].animKey + '-idle');
@@ -54,10 +56,7 @@ class firstScene extends Phaser.Scene {
             window[enemyArray[i].id].anims.play(enemyArray[i].animKey + '-idle', false);
             //collider
             this.physics.add.collider(window[enemyArray[i].id], base);
-        }
-
-    //create boss
-        this.enemy = new EnemyCreate({scene:this}, game.config.width);    
+        }   
 
     //colliders
         this.physics.add.collider(player, base);
@@ -69,22 +68,13 @@ class firstScene extends Phaser.Scene {
     }
 
     update() {
-    //Movement
         new PlayerUpdate({scene:this});
         
-    //Text 
+    //text 
         document.querySelector('.debug').innerHTML = 
-            // 'pl cell: ' + (player.x-cell/2) / cell +'<br>'+ 
-            // 'mu cell: ' + (mummy.x-cell/2) / cell +'<br>'+
-
-            // 'distancem1: ' + distance(player, mummy) +'<br>'+
-            // 'distance m2: ' + distance(player, mummy2) +'<br>'+
-
             'ap: ' + playerAp +'<br>'+ 
             'turnAction: ' + turnAction +'<br>'+ 
-            'enemyTurn: ' + enemyTurn +'<br>'+ 
-            enemyArray[0].state +'<br>'+ 
-            enemyArray[0].stateTimer +
+            'enemyTurn: ' + enemyTurn +'<br>'+
             '';
     }
 }

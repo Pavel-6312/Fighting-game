@@ -34,26 +34,23 @@ class EnemyCreate extends Phaser.GameObjects.Container
     constructor(config, x)
     {
         super(config.scene);
-
-        this.anims = config.scene.anims;
   
-        enemy = config.scene.physics.add.sprite(0,0, 'e-idle');
-        enemy.x = x;
-        enemy.body.setSize(56, 68, 1, 1); 
+        enemy = config.scene.physics.add.sprite(x, 0, 'e-idle');
+        enemy.body.setSize(48, 68, 1, 1); 
         enemyAp = 2;
         
 //walk
-        this.anims.create({
+        config.scene.anims.create({
             key: 'p2-walk',
-            frames: this.anims.generateFrameNumbers('p2-walk', { start: 0, end: 6 }),
+            frames: config.scene.anims.generateFrameNumbers('p2-walk', { start: 0, end: 6 }),
             frameRate: 6,
             repeat: -1 // -1 run forever / 1 -> run once
         });
 
 //idle
-        this.anims.create({
+        config.scene.anims.create({
             key: 'e-idle',
-            frames: this.anims.generateFrameNumbers('e-idle', { start: 0, end: 4 }),
+            frames: config.scene.anims.generateFrameNumbers('e-idle', { start: 0, end: 4 }),
             frameRate: 6,
             repeat: -1 // -1 run forever / 1 -> run once
         });
@@ -61,17 +58,17 @@ class EnemyCreate extends Phaser.GameObjects.Container
         enemy.anims.play('e-idle', false);
 
 //attack
-        this.anims.create({
+        config.scene.anims.create({
             key: 'e-attack',
-            frames: this.anims.generateFrameNumbers('e-attack', { start: 0, end: 0 }),
+            frames: config.scene.anims.generateFrameNumbers('e-attack', { start: 0, end: 0 }),
             frameRate: 1,
         });       
 
 //death
-        this.anims.create({
+        config.scene.anims.create({
             key: 'e-death',
-            frames: this.anims.generateFrameNumbers('e-attack', { start: 0, end: 0 }),
-            frameRate: 1,
+            frames: config.scene.anims.generateFrameNumbers('e-attack', { start: 0, end: 6 }),
+            frameRate: 10,
             repeat:1,
         });   
     }
@@ -82,36 +79,35 @@ class BasicEnemyAnimsCreate extends Phaser.GameObjects.Container{
     constructor(config, animKey)
     {
         super(config.scene);        
-        this.anims = config.scene.anims;
 
         //idle
-        this.anims.create({
+        config.scene.anims.create({
             key: animKey + '-idle',
-            frames: this.anims.generateFrameNumbers(animKey + '-idle', { start: 0, end: 4 }),
+            frames: config.scene.anims.generateFrameNumbers(animKey + '-idle', { start: 0, end: 4 }),
             frameRate: 6,
             repeat: -1 // -1 run forever / 1 -> run once
         });
 
         //walk
-        this.anims.create({
+        config.scene.anims.create({
             key: animKey + '-walk',
-            frames: this.anims.generateFrameNumbers(animKey + '-walk', { start: 0, end: 6 }),
+            frames: config.scene.anims.generateFrameNumbers(animKey + '-walk', { start: 0, end: 6 }),
             frameRate: 10,
             repeat: 0
         });
 
         //attack
-        this.anims.create({
+        config.scene.anims.create({
             key: animKey + '-attack',
-            frames: this.anims.generateFrameNumbers(animKey + '-attack', { start: 0, end: 6 }),
+            frames: config.scene.anims.generateFrameNumbers(animKey + '-attack', { start: 0, end: 6 }),
             frameRate: 10,
             repeat:0
         });       
 
         //death
-        this.anims.create({
+        config.scene.anims.create({
             key: animKey + '-death',
-            frames: this.anims.generateFrameNumbers(animKey + '-death', { start: 0, end: 10 }),
+            frames: config.scene.anims.generateFrameNumbers(animKey + '-death', { start: 0, end: 6 }),
             frameRate: 10,
             repeat:0,
         });   
