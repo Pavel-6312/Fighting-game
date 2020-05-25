@@ -160,17 +160,17 @@ var actionsArray = [
     {
         label: 'Attack',
         var: 'attack',
-        durability: 6,
+        durability: 66,
     },
     {
         label: 'Block',
         var: 'block',
-        durability: 4,
+        durability: 64,
     },
     {
         label: 'Bow',
         var: 'bow',
-        durability: 2,
+        durability: 62,
     },
 ]
 
@@ -189,17 +189,22 @@ var playerActionsArray = [
     {
         label: 'Attack',
         var: 'attack',
-        durability: 6,
+        durability: 66,
     },
     {
         label: 'Block',
         var: 'block',
-        durability: 4,
+        durability: 64,
+    },
+    {
+        label: 'Block',
+        var: 'block',
+        durability: 64,
     },
     {
         label: 'Bow',
         var: 'bow',
-        durability: 2,
+        durability: 62,
     },
 ]
 
